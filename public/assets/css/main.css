@@ -1,0 +1,290 @@
+/*? Start Card Device */
+
+/* .container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+} */
+
+.container .card-device {
+  position: relative;
+  /* width: 500px;
+  height: 230px; */
+  width: fit-content;
+  height: fit-content;
+  padding: 15px;
+  background-color: #fff;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, .3);
+}
+.container .card-device h2 {
+  z-index: 99;
+  position: absolute;
+  bottom: 25px;
+  right:115px;
+  font-size: 45px;
+  font-weight: 700;
+  color: #fff;
+  pointer-events: none;
+  transition: .2s ease;
+  text-shadow: 0 0 15px rgba(0, 0, 0, .5);
+}
+.container .card-device p {
+  z-index: 99;
+  position: absolute;
+  bottom: 30px;
+  right: 130px;
+  width: 150px;
+  color: #fff;
+  opacity: 0;
+  font-size: 12px;
+  text-align: right;
+  letter-spacing: 1px;
+  transition: .2s ease;
+}
+.container .card-device span {
+  z-index: 99;
+  position: absolute;
+  top: 60px;
+  right: 35px;
+  color: #333;
+  font-size: 12px;
+  letter-spacing: 1px;
+  writing-mode: vertical-lr;
+  transition: .2s ease;
+  opacity: .7;
+}
+.container .card-device .pic{
+  z-index: 100;
+  width: 395px;
+  height: 200px;
+  background-image: url('/assets/img/card-device/1.jpg');
+  background-size: cover;
+  border-radius: 12px;
+  filter: grayscale(100%);
+  transition: .3s ease;
+}
+.container .card-device button {
+  position: absolute;
+  right: 30px;
+  bottom: 40px;
+  width: 30px;
+  height: 30px;
+  background-color: #da4d1d;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  outline: none;
+  opacity: 1;
+  transition: .3s ease;
+}
+.container .card-device:hover button {
+  transform: scale(16.5);
+  opacity: .6;
+}
+.container .card-device:hover h2 {
+  bottom: 100px;
+  right: 50px;
+}
+.container .card-device:hover p {
+  opacity: 1;
+  right: 60px;
+}
+.container .card-device:hover span {
+  opacity: 0;
+  top: 80px;
+}
+.container .card-device:hover .pic {
+  filter: grayscale(0);
+  /* width: 470px; */
+}
+.container .card2 .pic {
+  background-image: url('/assets/img/card-device/1.jpg');
+  transition: .3s ease;
+}
+.container .card2 button {
+  background-color: #2b26c3;
+}
+
+/*? End Card Device*/
+
+/*? Start Toggle Switch (On/Off) */
+    .power-switch {
+        --color-invert: #ffffff;
+        --width: 150px;    
+        --height: 150px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: var(--width);
+        height: var(--height);
+        .button-on-off {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        &:after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: radial-gradient(circle closest-side, var(--color-invert), transparent);
+            filter: blur(20px);
+            opacity: 0;
+            transition: opacity 1s ease, transform 1s ease;
+            transform: perspective(1px) translateZ(0);
+            backface-visibility: hidden;
+        }
+        .power-on,
+        .power-off {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            z-index: 1;
+            fill: none;
+            stroke: var(--color-invert);
+            stroke-width: 8px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            .line {
+            opacity: .2;
+            }
+            .circle {
+            opacity: .2;
+            transform: rotate(-58deg);
+            transform-origin: center 80px;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 40;
+            }
+        }
+        .power-on {
+            filter: drop-shadow(0px 0px 6px rgba(255,255,255,.8));
+            .line {
+            opacity: 0;
+            transition: opacity .3s ease 1s;
+            }
+            .circle {
+            opacity: 1;
+            stroke-dashoffset: 220;
+            transition: transform 0s ease, stroke-dashoffset 1s ease 0s;
+            }
+        }
+        }
+        .checkbox-on-off{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        z-index: 2;
+        cursor: pointer;
+        opacity: 0;
+        &:checked {
+            + .button-on-off {
+            &:after {
+                opacity: 0.15;
+                transform: scale(2) perspective(1px) translateZ(0);
+                backface-visibility: hidden;
+                transition: opacity .5s ease, transform .5s ease;
+            }
+            .power-on,
+            .power-off {
+                animation: click-animation .3s ease forwards;
+                transform: scale(1);
+                .line {
+                animation: line-animation .8s ease-in forwards;
+                }
+                .circle {
+                transform: rotate(302deg);
+                }
+            }
+            .power-on {
+                .line {
+                opacity: 1;
+                transition: opacity .05s ease-in .55s;
+                }
+                .circle {
+                transform: rotate(302deg);
+                stroke-dashoffset: 40;
+                transition: transform .4s ease .2s, stroke-dashoffset .4s ease .2s;
+                }
+            }
+            }
+        }
+        }
+    }
+    
+    @keyframes line-animation {
+        0% {
+        transform: translateY(0);
+        }
+        10% {
+        transform: translateY(10px);
+        }
+        40% {
+        transform: translateY(-25px);
+        }
+        60% {
+        transform: translateY(-25px);
+        }
+        85% {
+        transform: translateY(10px);
+        }
+        100% {
+        transform: translateY(0px);
+        }
+    }
+    
+    @keyframes click-animation {
+        0% {
+        transform: scale(1);
+        }
+        50% {
+        transform: scale(.9);
+        }
+        100% {
+        transform: scale(1);
+        }
+    }
+    
+    .toggle-switch { 
+        /* margin: auto; */
+        padding: 20px;
+        box-shadow: 0px 5px 35px #d7d7d7;
+        border-radius: 35px;
+        background: #344767;
+        font: 400 16px 'Poppins', sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .socials {
+        position: fixed;
+        display: block;
+        left: 20px;
+        bottom: 20px;
+        > a {
+            display: block;
+            width: 30px;
+            opacity: .2;
+            transform: scale(var(--scale, .8));
+            transition: transform .3s cubic-bezier(0.38,-0.12, 0.24, 1.91);
+            &:hover {
+            --scale: 1;
+            }
+        }
+        }
+    }
+
+    .card-on-off{
+        /* margin: 25px auto; */
+        padding: 30px;
+    }
+
+/*? End Toggle Switch (On/Off) */
