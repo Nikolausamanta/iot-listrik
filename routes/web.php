@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\ManageStatusController;
+use App\Http\Controllers\ManageScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,3 +28,4 @@ use Illuminate\Support\Facades\Route;
 Route::resource('/', DashboardController::class);
 Route::resource('manage-device', ManageController::class);
 Route::resource('manage-status', ManageStatusController::class);
+Route::resource('manage-schedule', ManageScheduleController::class);
