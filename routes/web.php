@@ -23,21 +23,20 @@ use Illuminate\Support\Facades\Route;
 
 
 
+Route::middleware('isLogin')->group(function () {
+    Route::resource('/', DashboardController::class);
+    Route::resource('manage-device', ManageController::class);
+    Route::resource('manage-schedule', ManageScheduleController::class);
+    Route::resource('manage-status', ManageStatusController::class);
+    Route::resource('manage-relay', ManageRelayController::class);
 
-
-Route::resource('/', DashboardController::class);
-Route::resource('manage-device', ManageController::class)->middleware('isLogin');
-Route::resource('manage-schedule', ManageScheduleController::class);
-Route::resource('manage-status', ManageStatusController::class);
-Route::resource('manage-relay', ManageRelayController::class);
-
-Route::get('manage-status/updatesensor/{voltage}/{current}/{power}/{energy}/{frequency}/{powerfactor}', [ManageStatusController::class, 'simpansensor']);
-Route::get('manage-relay/relay/{value}', [ManageRelayController::class, 'relay']);
-Route::get('manage-send/', [ManageRelayController::class, 'send']);
-// Route::get('manage-relay/send', 'ManageRelayController@index');
-// Route::get('manage-relay/relay', [ManageRelayController::class, 'relay']);
-// Route::get('manage-relay/numberrelay', [ManageRelayController::class, 'numberrelay']);
-
+    Route::get('manage-status/updatesensor/{voltage}/{current}/{power}/{energy}/{frequency}/{powerfactor}', [ManageStatusController::class, 'simpansensor']);
+    Route::get('manage-relay/relay/{value}', [ManageRelayController::class, 'relay']);
+    Route::get('manage-send/', [ManageRelayController::class, 'send']);
+    // Route::get('manage-relay/send', 'ManageRelayController@index');
+    // Route::get('manage-relay/relay', [ManageRelayController::class, 'relay']);
+    // Route::get('manage-relay/numberrelay', [ManageRelayController::class, 'numberrelay']);
+});
 
 
 
