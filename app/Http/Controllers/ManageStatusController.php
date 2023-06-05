@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ManageStatusModel;
+use App\Models\ManageRelayModel;
+
 
 class ManageStatusController extends Controller
 {
@@ -13,10 +16,38 @@ class ManageStatusController extends Controller
      */
     public function index()
     {
+        $data = ManageStatusModel::select('*')->get();
+        $data2 = ManageRelayModel::select('*')->get();
         return view('manage.status.4-channel.index-status', [
             'title' => 'Status'
-        ]);
+        ])->with('data', $data, $data2);
     }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function simpansensor()
+    {
+
+        $data = [
+            'voltage' => request()->voltage,
+            'current' => request()->current,
+            'power' => request()->power,
+            'energy' => request()->energy,
+            'frequency' => request()->frequency,
+            'powerfactor' => request()->powerfactor,
+        ];
+        ManageStatusModel::where('sensor_id', '1')->update($data);
+        // ManageScheduleModel::where('schedule_id', $id)->update($data);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
     /**
      * Show the form for creating a new resource.

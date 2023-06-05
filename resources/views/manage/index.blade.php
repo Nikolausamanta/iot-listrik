@@ -6,7 +6,7 @@
         <div class="col-lg-5 me-5">
             <div class="container">
                 <div class="card-device">
-                    <h2>Ruang Tamu</h2>
+                    <h2>Living Room</h2>
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
                     <span>Hover hire</span>
                     <div class="pic"></div>

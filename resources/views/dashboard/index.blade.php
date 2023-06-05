@@ -4,6 +4,13 @@
   
 {{--? Start Card Content  --}}
 <div class="container-fluid py-4">
+    @if (Session::has('success'))
+        <div class="pt-3">
+          <div class="alert alert-success">
+            {{Session::get('success')}}
+          </div>
+        </div>
+        @endif
     <div class="row">
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <div class="card">

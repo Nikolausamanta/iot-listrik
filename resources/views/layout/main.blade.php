@@ -13,27 +13,29 @@
     <link href={{ url('assets/css/nucleo-icons.css') }} rel="stylesheet" />
     <link href={{ url('assets/css/nucleo-svg.css') }} rel="stylesheet" />
     <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    {{-- <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> --}}
     <link href={{ url('assets/css/nucleo-svg.css') }} rel="stylesheet" />
     
     <!-- CSS Files -->
     <link id="pagestyle" href={{ url('assets/css/argon-dashboard.css?v=2.0.4') }} rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link id="pagestyle" href={{ url('assets/css/main.css') }} rel="stylesheet" />
 </head>
 
-<body class="g-sidenav-show   bg-gray-100">
-    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+<body class="g-sidenav-show bg-gray-200">
+    <div class="min-height-300 position-absolute w-100"></div>
 
-
-    @include('partials.sidebar')
+    @if (Auth::check())  
+        @include('partials.sidebar')
+    @endif
 
 
     {{--? Start Main Content --}}
     <main class="main-content position-relative border-radius-lg ">
-       @include('partials.navbar')
-
-       @yield('content')
+       {{-- @include('partials.navbar') --}}
         
+        
+        @yield('content')
         @include('partials.footer')
         </div>
     </main>
@@ -141,6 +143,9 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src={{ url('assets/js/argon-dashboard.min.js?v=2.0.4') }}></script>
+    <script src={{ url('assets/js/main.js') }}></script>
+    
+
     
     </body>
 </html>
