@@ -18,21 +18,27 @@ function ubahstatus3(value)
     }
     //execute file PHP untuk merubah nilai di database
     // xmlhttp.open("GET", "/manage-switch/" + value, true);
-    xmlhttp.open("GET", "/manage-relay/relay/" + value, true);
+    xmlhttp.open("GET", "/manage-status/relay/" + value, true);
     xmlhttp.send();
 }
 
-// $(document).ready(function(){
-//     setInterval(function(){
-//         $("#datajam").load('jam');
-//     },999);
-// });
 
-$(document).ready(function(){
-    setInterval(function(){
-        $("#aaa").load('ubahstatus/{device_id}');
-    },100);
+$(document).ready(function() {
+    setInterval(function() {
+        $.ajax({
+            url: '/ubahstatus',
+            type: 'GET',
+            success: function(response) {
+                // Tambahkan logika untuk menangani respons dari server
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+        });
+    }, 999); // Set interval waktu per detik (1000 ms = 1 detik)
 });
+
+
 
 // $(document).ready(function(){
 //     setInterval(function(){
@@ -67,26 +73,22 @@ const clock = setInterval(function time() {
 }, 500);
 
 
-// get mac address
-$('#triggerButton').click(function() {
-    // Kirim permintaan AJAX ke controller
-    $.ajax({
-      url: 'show-mac', // Ganti dengan URL sebenarnya ke controller Anda
-      type: 'GET',
-      success: function(response) {
-        // Tampilkan data dari respons di dalam elemen HTML yang sesuai
-        var html = '';
-  
-        // Buat tampilan data sesuai kebutuhan Anda
-        html += response.mac_address
-        // Tampilkan data dari respons di dalam elemen HTML yang sesuai
-        $('#dataContainer').html(html);
-      },
-      error: function(xhr, status, error) {
-        console.log(xhr.responseText);
-      }
+// MAC Address
+$(document).ready(function () {
+    $("#triggerButton").click(function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Send an AJAX request to the server
+        $.ajax({
+            url: "show-mac", // Replace with the actual URL to your controller
+            type: "GET",
+            success: function (response) {
+                // Update the value of the input field with the received Mac Address
+                $('input[name="mac_address"]').val(response.mac_address);
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            },
+        });
     });
-  });
-
-
-  
+});

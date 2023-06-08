@@ -14,7 +14,7 @@
           </div>
       </div>
       <div class="col-lg-8">
-        <a href="/manage-countdown/{{$device_id}}">
+        <a href="/timers/{{$device_id}}">
             <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
         </a>
         <a href="/manage-schedule/{{$device_id}}">

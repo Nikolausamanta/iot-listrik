@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\ManageDeviceModel;
-use App\Models\ManageRelayModel;
-use App\Models\ManageScheduleModel;
-use App\Models\ManageStatusModel;
 use App\Models\TimerModel;
+use Illuminate\Http\Request;
+use App\Models\MacAddressModel;
+use App\Models\ManageRelayModel;
+use App\Models\ManageDeviceModel;
+use App\Models\ManageStatusModel;
+use App\Models\ManageScheduleModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -24,7 +25,21 @@ class ManageDeviceController extends Controller
         //     'title' => 'Manage Device'
         // ]);
     }
+    public function getData()
+    {
+        $macAddresses = MacAddressModel::orderBy('id', 'desc')->first();
 
+        return response()->json($macAddresses);
+    }
+
+    public function sendMacAddress(Request $request)
+    {
+        $macAddress = new MacAddressModel();
+        $macAddress->mac_address = $request->input('mac_address');
+        $macAddress->save();
+
+        return response()->json(['message' => 'Mac address Sudah Simpan DB']);
+    }
     /**
      * Show the form for creating a new resource.
      *

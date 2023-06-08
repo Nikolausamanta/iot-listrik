@@ -15,19 +15,31 @@ class TimerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    // public function index()
+    // {
+    //     $timers = TimerModel::all();
+
+    //     return view('timer.index', [
+    //         'title' => 'Manage Device'
+    //     ], compact('timers'));
+    // }
+
+    public function tampil(Request $request)
     {
-        $timers = TimerModel::all();
+        $device_id = $request->route('device_id');
+        $timers = TimerModel::where('device_id', $device_id)->get();
+
+        session(['device_id' => $device_id]);
 
         return view('timer.index', [
-            'title' => 'Manage Device'
-        ], compact('timers'));
+            'title' => 'Status'
+        ], compact('timers'))->with('device_id', $device_id);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'relay_id' => 'required',
+            'device_id' => 'required',
             'duration_hour' => 'required|integer|min:0',
             'duration_minute' => 'required|integer|min:0',
             'duration_second' => 'required|integer|min:0',
@@ -35,37 +47,41 @@ class TimerController extends Controller
 
         $duration = $request->duration_hour * 3600 + $request->duration_minute * 60 + $request->duration_second;
 
-        TimerModel::createOrUpdate($request->relay_id, $duration);
+        TimerModel::createOrUpdate($request->device_id, $duration);
 
-        return redirect()->route('timers.index')->with('success', 'Timer created or updated successfully.');
+        $device_id_session = session('device_id');
+
+        return redirect('/timers/' . $device_id_session)->with('success', 'Timer created or updated successfully.');
     }
 
     public function start(Request $request, TimerModel $timer)
     {
         $timer->startTimer();
+        $device_id_session = session('device_id');
 
-        return redirect()->route('timers.index')->with('success', 'Timer started successfully.');
+        return redirect('/timers/' . $device_id_session)->with('success', 'Timer started successfully.');
     }
 
     public function cancel(Request $request, TimerModel $timer)
     {
         $timer->cancelTimer();
+        $device_id_session = session('device_id');
 
-        return redirect()->route('timers.index')->with('success', 'Timer canceled successfully.');
+        return redirect('/timers/' . $device_id_session)->with('success', 'Timer canceled successfully.');
     }
 
     public function updateSwitch(Request $request, $timer)
     {
-        $dataTimer = TimerModel::where('timer_id', $timer)->get('relay_id');
+        $dataTimer = TimerModel::where('timer_id', $timer)->get('device_id');
 
         foreach ($dataTimer as $schedule) {
-            $relay_id = $schedule->relay_id;
-            $relay = ManageRelayModel::where('relay_id', $relay_id)->first();
+            $device_id = $schedule->device_id;
+            $relay = ManageRelayModel::where('device_id', $device_id)->first();
 
             // Memperbarui nilai switch berdasarkan kondisi yang diberikan
             $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
 
-            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => $newSwitchValue]);
+            ManageRelayModel::where('device_id', $device_id)->update(['switch' => $newSwitchValue]);
         }
     }
 

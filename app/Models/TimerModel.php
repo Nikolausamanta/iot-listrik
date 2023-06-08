@@ -15,9 +15,9 @@ class TimerModel extends Model
     protected $primaryKey = 'timer_id';
     protected $fillable = ['relay_id', 'device_id', 'duration', 'end_time'];
 
-    public static function createOrUpdate($relayId, $duration)
+    public static function createOrUpdate($deviceId, $duration)
     {
-        $timer = TimerModel::where('relay_id', $relayId)->first();
+        $timer = TimerModel::where('device_id', $deviceId)->first();
 
         if ($timer) {
             $timer->update([
@@ -26,7 +26,7 @@ class TimerModel extends Model
             ]);
         } else {
             TimerModel::create([
-                'relay_id' => $relayId,
+                'device_id' => $deviceId,
                 'duration' => $duration,
                 'end_time' => Carbon::now()->addSeconds($duration),
             ]);

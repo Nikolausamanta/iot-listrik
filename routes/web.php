@@ -27,6 +27,8 @@ use App\Models\ManageStatusModel;
 |
 */
 
+Route::get('manage-device/show-mac', [ManageDeviceController::class, 'getData']);
+
 Route::get('add-device', [AddDeviceController::class, 'index']);
 Route::get('show-mac', [AddDeviceController::class, 'getData']);
 
@@ -35,11 +37,12 @@ Route::get('manage-status/{device_id}', [ManageStatusController::class, 'tampil'
 Route::get('manage-schedule/{device_id}', [ManageScheduleController::class, 'tampil'])->name('manage-schedule.tampil');
 Route::get('manage-countdown/{device_id}', [TimerController::class, 'tampil'])->name('manage-countdown.tampil');
 
-Route::get('/timers', [TimerController::class, 'index'])->name('timers.index');
+Route::get('/timers/{device_id}', [TimerController::class, 'tampil'])->name('timers.tampil');
 Route::post('/timers', [TimerController::class, 'store'])->name('timers.store');
 Route::post('/timers/{timer}/start', [TimerController::class, 'start'])->name('timers.start');
 Route::post('/timers/{timer}/cancel', [TimerController::class, 'cancel'])->name('timers.cancel');
 Route::post('/timers/{timer}/update-switch', [TimerController::class, 'updateSwitch'])->name('timers.updateSwitch');
+
 
 // Route::get('/timers', 'TimerController@index')->name('timers.index');
 // Route::post('/timers', 'TimerController@store')->name('timers.store');
@@ -69,7 +72,7 @@ Route::middleware('isLogin')->group(function () {
 
 Route::get('manage-status/updatesensor/{voltage}/{current}/{power}/{energy}/{frequency}/{powerfactor}', [ManageStatusController::class, 'simpansensor']);
 
-Route::get('manage-status/relay/{value}', [ManageRelayController::class, 'relay']);
+Route::get('manage-status/relay/{value}', [ManageStatusController::class, 'relay']);
 Route::get('manage-send/', [ManageRelayController::class, 'send']);
 
 // Route::get('manage-relay/relay/{value}', [ManageRelayController::class, 'relay']);
@@ -78,7 +81,7 @@ Route::get('manage-send/', [ManageRelayController::class, 'send']);
 // Route::get('manage-status/sensor', [ManageStatusController::class, 'sensor']);
 
 Route::controller(ManageScheduleController::class)->group(function () {
-    Route::get('ubahstatus/{device_id}', 'ubahstatus');
+    Route::get('ubahstatus', 'ubahstatus')->name('ubahstatus');
     // Route::get('kirimstatus', 'kirimstatus');
     Route::get('jam', 'jam');
 });
@@ -90,20 +93,3 @@ Route::controller(SessionController::class)->group(function () {
     Route::get('sesi/register', 'register')->middleware('isTamu');
     Route::post('/sesi/create', 'create')->middleware('isTamu');
 });
-
-
-
-
-
-
-// Route::group([], function () {
-//     Route::get('/', [ManageStatusController::class, 'index']);
-//     Route::get('/demo', [ManageStatusController::class, 'index']);
-//     Route::get('/manage-status/index', [ManageStatusController::class, 'index']);
-//     Route::get('/manage-status/ajax', [ManageStatusController::class, 'ajax']);
-// });
-
-// Route::controller(ManageStatusController::class)->group(function () {
-//     // Checkbox
-//     Route::post('form/checkbox/new', 'formCheckbox')->name('form/checkbox/new');
-// });

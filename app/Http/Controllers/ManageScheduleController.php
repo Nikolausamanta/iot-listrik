@@ -35,6 +35,9 @@ class ManageScheduleController extends Controller
         $data1 = ManageScheduleModel::where('device_id', $device_id)->orderBy('updated_at', 'desc')->paginate(6);
         $data2 = ManageScheduleModel::where('device_id', $device_id)->orderBy('waktu1', 'asc')->limit(1)->get();
 
+        session(['device_id' => $device_id]);
+
+
         // return $data2;
         return view('manage.schedule.4-channel.index-schedule', [
             'title' => 'Status'
@@ -59,24 +62,22 @@ class ManageScheduleController extends Controller
      */
     public function store(Request $request)
     {
+
         Session::flash('nama_schedule', $request->nama_schedule);
         Session::flash('waktu1', $request->waktu1);
         Session::flash('waktu2', $request->waktu2);
         Session::flash('tanggal1', $request->tanggal1);
-        Session::flash('relay_id', $request->relay_id);
 
         $request->validate([
             'nama_schedule' => 'required',
             'waktu1' => 'required',
             'waktu2' => 'required',
             'tanggal1' => 'required',
-            'relay_id' => 'required',
         ], [
             'nama_schedule.required' => 'diisi woy',
             'waktu1.required' => 'diisi woy',
             'waktu2.required' => 'diisi woy',
             'tanggal1.required' => 'diisi woy',
-            'relay_id' => 'diisi woy',
         ]);
 
         // $data = [
@@ -87,12 +88,12 @@ class ManageScheduleController extends Controller
         // ];
 
         // ManageScheduleModel::create($data);
+        $device_id_session = session('device_id');
 
         $nama_schedule = $request->input('nama_schedule');
         $tanggal1 = $request->input('tanggal1');
         $waktu1 = $request->input('waktu1');
         $waktu2 = $request->input('waktu2');
-        $relay_id = $request->input('relay_id');
 
         $gabung1 = $tanggal1 . ' ' . $waktu1;
         $gabung2 = $tanggal1 . ' ' . $waktu2;
@@ -104,13 +105,13 @@ class ManageScheduleController extends Controller
         $waktuEpoch2 = $dateTime2->timestamp;
 
         ManageScheduleModel::create([
+            'device_id' => $device_id_session,
             'nama_schedule' => $nama_schedule,
-            'relay_id' => $relay_id,
             'waktu1' => $waktuEpoch1,
             'waktu2' => $waktuEpoch2,
         ]);
 
-        return redirect()->to('manage-schedule')->with('success', 'berhasil menambahkan data uy');
+        return redirect()->to('manage-schedule/' . $device_id_session)->with('success', 'berhasil menambahkan data uy');
     }
 
     /**
@@ -211,21 +212,23 @@ class ManageScheduleController extends Controller
         date_default_timezone_set('Asia/Singapore');
         $time = time();
 
-        $device_id = $request->route('device_id');
-        $data = ManageScheduleModel::where('device_id', $device_id)->orderBy('schedule_id', 'asc')->get();
+        $device_id_session = session('device_id');
+        $data = ManageScheduleModel::where('device_id', $device_id_session)->orderBy('schedule_id', 'asc')->get();
+        // $data = ManageRelayModel::where('device_id', $device_id_session)->get();
         // $data = ManageScheduleModel::orderBy('schedule_id', 'asc')->get();
 
         foreach ($data as $schedule) {
             $id = $schedule->schedule_id;
-            $relay_id = $schedule->relay_id;
+            $device_id = $schedule->device_id;
             $jam = $schedule->waktu1;
             $jam2 = $schedule->waktu2;
 
-
-            if ($time == $jam) {
-                ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
-            } elseif ($time == $jam2) {
-                ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
+            if ($device_id == $device_id_session) {
+                if ($time == $jam) {
+                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 1]);
+                } elseif ($time == $jam2) {
+                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 0]);
+                }
             }
         }
     }

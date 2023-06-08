@@ -34,19 +34,6 @@ class ManageRelayController extends Controller
     }
 
 
-    public function relay($value)
-    {
-        $relay_id = 1;
-        if ($value == "on") {
-            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
-            $hasil = 1;
-        } else {
-            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
-            $hasil = 0;
-        }
-
-        return $hasil;
-    }
     /**
      * Show the form for creating a new resource.
      *

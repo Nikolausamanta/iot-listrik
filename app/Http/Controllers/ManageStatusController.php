@@ -31,6 +31,8 @@ class ManageStatusController extends Controller
         $data1 = ManageStatusModel::where('device_id', $device_id)->get();
         $data2 = ManageRelayModel::where('device_id', $device_id)->get();
 
+        session(['device_id' => $device_id]);
+
         // return $data2;
         return view('manage.status.4-channel.index-status', [
             'title' => 'Status'
@@ -39,13 +41,24 @@ class ManageStatusController extends Controller
 
     public function relay($value)
     {
-        $relay_id = 1;
-        if ($value == "on") {
-            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
-            $hasil = 1;
-        } else {
-            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
-            $hasil = 0;
+        $device_id_session = session('device_id');
+        // $data22 = '2';
+        $data = ManageRelayModel::where('device_id', $device_id_session)->get();
+        // return $data;
+        foreach ($data as $relay) {
+            $device_id = $relay->device_id;
+            $relay_id = $relay->relay_id;
+            $switch = $relay->switch;
+
+            if ($device_id == $device_id_session) {
+                if ($value == "on") {
+                    ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
+                    $hasil = 1;
+                } else {
+                    ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
+                    $hasil = 0;
+                }
+            }
         }
 
         return $hasil;
