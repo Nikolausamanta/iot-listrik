@@ -20,12 +20,25 @@ class ManageScheduleController extends Controller
      */
     public function index()
     {
-        $data1 = ManageScheduleModel::orderBy('updated_at', 'asc')->limit(1)->get();
+        $data1 = ManageScheduleModel::orderBy('waktu1', 'asc')->limit(1)->get();
         // dd($data1);
-        $data = ManageScheduleModel::orderBy('updated_at', 'asc')->paginate(6);
+        $data = ManageScheduleModel::orderBy('updated_at', 'desc')->paginate(6);
         return view('manage.schedule.4-channel.index-schedule', [
             'title' => 'Manage Device'
         ])->with('data_manage_schedule', $data)->with('upcoming', $data1);
+    }
+
+    public function tampil(Request $request)
+    {
+        $device_id = $request->route('device_id');
+
+        $data1 = ManageScheduleModel::where('device_id', $device_id)->orderBy('updated_at', 'desc')->paginate(6);
+        $data2 = ManageScheduleModel::where('device_id', $device_id)->orderBy('waktu1', 'asc')->limit(1)->get();
+
+        // return $data2;
+        return view('manage.schedule.4-channel.index-schedule', [
+            'title' => 'Status'
+        ])->with('data_manage_schedule', $data1)->with('upcoming', $data2)->with('device_id', $device_id);
     }
 
     /**
@@ -50,17 +63,20 @@ class ManageScheduleController extends Controller
         Session::flash('waktu1', $request->waktu1);
         Session::flash('waktu2', $request->waktu2);
         Session::flash('tanggal1', $request->tanggal1);
+        Session::flash('relay_id', $request->relay_id);
 
         $request->validate([
             'nama_schedule' => 'required',
             'waktu1' => 'required',
             'waktu2' => 'required',
             'tanggal1' => 'required',
+            'relay_id' => 'required',
         ], [
             'nama_schedule.required' => 'diisi woy',
             'waktu1.required' => 'diisi woy',
             'waktu2.required' => 'diisi woy',
             'tanggal1.required' => 'diisi woy',
+            'relay_id' => 'diisi woy',
         ]);
 
         // $data = [
@@ -76,6 +92,7 @@ class ManageScheduleController extends Controller
         $tanggal1 = $request->input('tanggal1');
         $waktu1 = $request->input('waktu1');
         $waktu2 = $request->input('waktu2');
+        $relay_id = $request->input('relay_id');
 
         $gabung1 = $tanggal1 . ' ' . $waktu1;
         $gabung2 = $tanggal1 . ' ' . $waktu2;
@@ -88,6 +105,7 @@ class ManageScheduleController extends Controller
 
         ManageScheduleModel::create([
             'nama_schedule' => $nama_schedule,
+            'relay_id' => $relay_id,
             'waktu1' => $waktuEpoch1,
             'waktu2' => $waktuEpoch2,
         ]);
@@ -182,63 +200,33 @@ class ManageScheduleController extends Controller
     public function jam()
     {
         date_default_timezone_set('Asia/Singapore');
-        // $time = date('H:i:s', time());
-        // echo $time;
-        $epoch = time();
-        echo $epoch;
+        $time = date('H:i:s', time());
+        echo $time;
+        // $epoch = time();
+        // echo $epoch;
     }
 
-    public function ubahstatus()
+    public function ubahstatus(Request $request)
     {
         date_default_timezone_set('Asia/Singapore');
         $time = time();
 
-        $data = ManageScheduleModel::orderBy('schedule_id', 'asc')->get();
-
-        $hasil1 = null;
+        $device_id = $request->route('device_id');
+        $data = ManageScheduleModel::where('device_id', $device_id)->orderBy('schedule_id', 'asc')->get();
+        // $data = ManageScheduleModel::orderBy('schedule_id', 'asc')->get();
 
         foreach ($data as $schedule) {
             $id = $schedule->schedule_id;
+            $relay_id = $schedule->relay_id;
             $jam = $schedule->waktu1;
             $jam2 = $schedule->waktu2;
 
+
             if ($time == $jam) {
-                ManageScheduleModel::where('schedule_id', $id)->update(['status' => 1]);
-                $hasil1 = 'hidup';
+                ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
             } elseif ($time == $jam2) {
-                ManageScheduleModel::where('schedule_id', $id)->update(['status' => 0]);
-                $hasil1 = 'mati';
-                // break; // Keluar dari foreach jika kondisi terpenuhi
+                ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
             }
         }
-
-        echo $hasil1;
     }
-
-    // public function kirimstatus()
-    // {
-    //     // $data = ManageScheduleModel::orderBy('schedule_id', 'asc')->get();
-    //     // return $data;
-    //     $kirimstatus = ManageScheduleModel::where('status')->get();
-    //     // $kirimstatus2 = ManageScheduleModel::where('status', '0')->get();
-
-    //     foreach ($kirimstatus as $schedule) {
-
-    //         $id = $schedule->schedule_id;
-    //         $status1 = $schedule->status;
-    //         $status2 = 1;
-    //         $status3 = 0;
-    //         // echo $status;
-
-    //         if ($status1 == $status2) {
-    //             $check = ManageScheduleModel::where('schedule_id', $id)->get(['status' => 1]);
-    //             if ($check == 1) {
-    //                 echo "Hidup";
-    //             }
-    //         }
-    //         // elseif ($status == $status2) {
-    //         //     echo "Mati";
-    //         // }
-    //     }
-    // }
 }

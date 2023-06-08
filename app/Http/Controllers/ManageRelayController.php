@@ -36,16 +36,6 @@ class ManageRelayController extends Controller
 
     public function relay($value)
     {
-        // $status = new $value;
-        // $values = [
-        //     'switch' => $relay = '1',
-        // ];
-        // return $values;
-        // return $value;
-        // $relay = 2;
-        // return 'switch' . $relay;
-        // $relayId = 1;
-        // $value = 'off';
         $relay_id = 1;
         if ($value == "on") {
             ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
@@ -56,39 +46,6 @@ class ManageRelayController extends Controller
         }
 
         return $hasil;
-
-
-
-
-
-        // $userId = 1;
-        // if ($userId) {
-        //     if ($value == "on") {
-        //         ManageRelayModel::where('relay_id', $relayId)->update(['switch' => 1]);
-        //         $hasil = 1;
-        //     } else {
-        //         ManageRelayModel::where('relay_id', $relayId)->update(['switch' => 0]);
-        //         $hasil = 0;
-        //     }
-        // } else {
-        //     # code...
-        // }
-        // return $hasil;
-
-
-
-        // if ($value == "on") {
-        //     $data = ManageRelayModel::where('relay_id', $relayId)->update(['switch' . $relay => 1]);
-        // } elseif ($value == "off") {
-        //     $data = ManageRelayModel::where('relay_id', $relayId)->update(['switch' . $relay => 0]);
-        // } else {
-        //     return;
-        // }
-
-
-
-
-        // ManageRelayModel::where('relay_id', '1')->update($values);
     }
     /**
      * Show the form for creating a new resource.

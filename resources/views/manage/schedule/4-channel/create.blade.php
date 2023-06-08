@@ -65,6 +65,13 @@
           {{-- <input class="form-control" type="text" onfocus="focused(this)" onfocusout="defocused(this)"> --}}
         </div>
       </div>
+      <div class="col-md-12" hidden>
+        <div class="form-group">
+          <label for="example-text-input" class="form-control-label">Relay Id</label>
+          <input type="text" class="form-control" name="relay_id" value="1" placeholder="Date">
+          {{-- <input class="form-control" type="text" onfocus="focused(this)" onfocusout="defocused(this)"> --}}
+        </div>
+      </div>
     </div>
 
     <div class="text-center">

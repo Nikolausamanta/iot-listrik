@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&display=swap');
+
+
+
 /*? Start Title */
 .top-title h2{
   margin-bottom: -8px;
@@ -8,16 +12,126 @@
 }
 /*? End Title */
 
-
-
-
-/*? Start SSC  */
-.ssc{
-  text-align: right;
+/*? Start Line */
+hr.line {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 2px solid rgba(0, 0, 0, 0.299);
 }
-/*? End SSC  */
+/*? End Line */
 
+/*? Start Jam  */
+.clock{
+  /* width: 550px; */
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
+.clock div{
+  background-color: #fff;
+  height: 100%;
+  width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  color: #202020;
+  border-radius: 12px;
+  /* box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); */
+  letter-spacing: 3px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+}
+
+.clock span{
+  font-weight: bolder;
+  font-size: 60px;
+  color: #111; 
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+}
+/*? End Jam  */
+
+/*? Start tombol kanan  */
+.kanan {
+  float: left; /* Menggeser elemen ke kanan secara default */
+}
+
+@media (min-width: 992px) {
+  .col-lg-12 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-11 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-10 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-9 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-8 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-7 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-6 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-5 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-4 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-3 .kanan {
+    float: right; 
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-2 .kanan {
+    float: right; 
+  }
+}
+  
+@media (min-width: 992px) {
+  .col-lg-1 .kanan {
+    float: right; 
+  }
+  /*? Endt tombol kanan  */
+}
 
 /*? Start Card Device */
 

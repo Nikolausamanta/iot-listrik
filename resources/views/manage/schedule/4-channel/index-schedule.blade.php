@@ -4,7 +4,28 @@
 
 <div class="container-fluid py-4">
 
-    @include('partials.ssc')
+     {{--? Start Judul Atas --}}
+     <div class="row mt-3">
+      <div class="col-lg-4">
+          
+          <div class="top-title">
+              <h2 class="">Bathroom</h2>
+              <p>Have a nice day</p>
+          </div>
+      </div>
+      <div class="col-lg-8">
+        <a href="/manage-countdown/{{$device_id}}">
+            <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
+        </a>
+        <a href="/manage-schedule/{{$device_id}}">
+            <button type="button" class="kanan btn btn-outline-success me-2">Schedule</button>
+        </a>
+        <a href="/manage-status/{{$device_id}}">
+            <button type="button" class="kanan btn btn-outline-primary me-2">Status</button>
+        </a>
+      </div>
+    </div>
+    {{--? End Judul Atas --}}
 
     @if (Session::has('success'))
         <div class="pt-3">
@@ -15,31 +36,15 @@
     @endif
     <div class="row mt-4">
         <div class="col-xl-12 mb-xl-0 mb-4">
-          {{-- <button type="button" class="btn bg-gradient-primary btn-block" data-bs-toggle="modal" data-bs-target="#create-schedule">
-              <span class="btn-inner--icon"><i class="fas fa-plus"></i>&nbsp;&nbsp;</span>
-              <span class="btn-inner--text">Add New Schedule</span>
-          </button> --}}
+          
+            <h6>
+              <div id="aaa"></div>
+            </h6>
 
           <div class="row">
             <div class="col-lg-8 mb-lg-0 mb-4">
               {{--? Start Upcoming  --}}
-              <div class="row">
-                <div class="col-md-12 mb-lg-0 mb-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <h6>Jam Sekarang : </h6>
-                    </div>
-                    <div class="card-body">
-                      <h6>
-                        <div id="datajam"></div>
-                      </h6>
-                      <h6>
-                        <div id="aaa"></div>
-                      </h6>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
               <div class="row mt-4">
                 <div class="col-md-12 mb-lg-0 mb-4">
                   <div class="card">
@@ -54,68 +59,7 @@
                           </div>
                       </div>
                       <div class="card-body p-3">
-                          @foreach ($upcoming as $item)  
-                              <div class="row">
-                                  {{--? Start 1 --}}
-                                  <div class="col-lg-4 mb-lg-0 mb-4">
-                                      <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
-                                          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                              <div class="d-flex align-items-center text-sm">
-                                                  <button class="btn btn-link text-dark text-sm mb-0 px-0">
-                                                    <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
-                                                  </button>
-                                              </div>
-                                              <div class="d-flex flex-column">
-                                                <span class="text-sm">Schedule Name</span>
-                                                <h5 class="text-dark font-weight-bold">{{$item->nama_schedule}}</h5>
-                                                  {{-- <h5 class="text-dark font-weight-bold">{{$item->voltage}} kWh</h5> --}}
-                                              </div>
-                                          </li>
-                                      </div>
-                                  </div>
-                                  {{--? End 1 --}}
-
-                                  {{--? Start 2 --}}
-                                  <div class="col-lg-4 mb-lg-0 mb-4">
-                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
-                                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                            <div class="d-flex align-items-center text-sm">
-                                                <button class="btn btn-link text-dark text-sm mb-0 px-0">
-                                                  <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
-                                                </button>
-                                            </div>
-                                            <div class="d-flex flex-column">
-                                              <span class="text-sm">Time</span>
-                                              <h5 class="text-dark font-weight-bold">{{$item->waktu1}}</h5>
-                                                {{-- <h5 class="text-dark font-weight-bold">{{$item->voltage}} kWh</h5> --}}
-                                            </div>
-                                        </li>
-                                    </div>
-                                  </div>
-                                  {{--? End 2 --}}
-                                  
-                                  {{--? Start 3 --}}
-                                  <div class="col-lg-4 mb-lg-0 mb-4">
-                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
-                                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                            <div class="d-flex align-items-center text-sm">
-                                                <button class="btn btn-link text-dark text-sm mb-0 px-0">
-                                                  <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
-                                                </button>
-                                            </div>
-                                            <div class="d-flex flex-column">
-                                              <span class="text-sm">Schedule Name</span>
-                                              <h5 class="text-dark font-weight-bold">{{$item->tanggal1}}</h5>
-                                                {{-- <h5 class="text-dark font-weight-bold">{{$item->voltage}} kWh</h5> --}}
-                                            </div>
-                                        </li>
-                                    </div>
-                                  </div>
-                                  {{--? End 3 --}}
-                                  
-                                  
-                              </div>
-                          @endforeach
+                          
                       </div>
                   </div>
                 </div>
@@ -142,12 +86,10 @@
                           <thead>
                             <tr>
                               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ">Switch</th>
+                              {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ">Switch</th> --}}
                               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Schedule Name</th>
-                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Time</th>
-                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Time 2</th>
-                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date</th>
-                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date 2</th>
+                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Form Time</th>
+                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Until Time</th>
                               <th></th>
                             </tr>
                           </thead>
@@ -158,7 +100,7 @@
                                 <td class="ps-4">
                                   <p class="text-xs font-weight-bold mb-0">{{$i}}</p>
                                 </td>
-                                <td>
+                                {{-- <td>
                                   <div class="d-flex px-2 ps-2">
                                     <div>
                                       <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-spotify.svg" class="avatar avatar-sm rounded-circle me-2">
@@ -167,21 +109,15 @@
                                       <h6 class="mb-0 text-xs">Switch 1</h6>
                                     </div>
                                   </div>
-                                </td>
+                                </td> --}}
                                 <td>
                                   <p class="text-xs font-weight-bold mb-0">{{$item->nama_schedule}}</p>
                                 </td>
                                 <td >
-                                  <p class="text-xs font-weight-bold mb-0">{{$item->waktu1}}</p>
+                                  <p class="text-xs font-weight-bold mb-0">{{ \Carbon\Carbon::createFromTimestamp($item->waktu1, 'Asia/Singapore')->format('l, j F Y, H:i:s') }}</p>
                                 </td>
                                 <td >
-                                  <p class="text-xs font-weight-bold mb-0">{{$item->waktu2}}</p>
-                                </td>
-                                <td>
-                                  <p class="text-xs font-weight-bold mb-0">{{$item->tanggal1}}</p>
-                                </td>
-                                <td>
-                                  <p class="text-xs font-weight-bold mb-0">{{$item->tanggal2}}</p>
+                                  <p class="text-xs font-weight-bold mb-0">{{ \Carbon\Carbon::createFromTimestamp($item->waktu2, 'Asia/Singapore')->format('l, j F Y, H:i:s') }}</p>
                                 </td>
                                 <td class="align-middle">
                                   <a href="{{url('manage-schedule/'.$item->schedule_id.'/edit')}}"  class="btn btn-primary font-weight-bold text-xs">
@@ -218,11 +154,27 @@
 
             {{--? Start Input --}}
             <div class="col-lg-4">
-              @if (empty($edit_schedule))
+
+              <div class="row mt-4">
+                <div class="col-md-12 mb-lg-0 mb-4">
+                  <div class="card">
+                    <div class="clock">
+                      <div id="hour">00</div>
+                      <span>:</span>
+                      <div id="minute">00</div>
+                      <span>:</span>
+                      <div id="seconds">00</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4">
+                @if (empty($edit_schedule))
                 @include('manage.schedule.4-channel.create')  
-              @else
+                @else
                 @include('manage.schedule.4-channel.edit')  
-              @endif
+                @endif
+              </div>
             </div>
             {{--? End Input --}}  
         </div>

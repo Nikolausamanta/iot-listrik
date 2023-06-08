@@ -14,14 +14,43 @@ class ManageStatusController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    // public function index()
+    // {
+
+    //     $data = ManageStatusModel::select('*')->get();
+    //     $data2 = ManageRelayModel::select('*')->get();
+    //     return view('manage.status.4-channel.index-status', [
+    //         'title' => 'Status'
+    //     ])->with('data', $data2)->with('sensor', $data);
+    // }
+
+    public function tampil(Request $request)
     {
-        $data = ManageStatusModel::select('*')->get();
-        $data2 = ManageRelayModel::select('*')->get();
+        $device_id = $request->route('device_id');
+
+        $data1 = ManageStatusModel::where('device_id', $device_id)->get();
+        $data2 = ManageRelayModel::where('device_id', $device_id)->get();
+
+        // return $data2;
         return view('manage.status.4-channel.index-status', [
             'title' => 'Status'
-        ])->with('data', $data, $data2);
+        ])->with('sensor', $data1)->with('data', $data2)->with('device_id', $device_id);
     }
+
+    public function relay($value)
+    {
+        $relay_id = 1;
+        if ($value == "on") {
+            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
+            $hasil = 1;
+        } else {
+            ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
+            $hasil = 0;
+        }
+
+        return $hasil;
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -41,6 +70,16 @@ class ManageStatusController extends Controller
         ];
         ManageStatusModel::where('sensor_id', '1')->update($data);
         // ManageScheduleModel::where('schedule_id', $id)->update($data);
+        // $sensor = ManageStatusModel::select('*')->get();
+        // return view('manage.status.4-channel.index-status')->with('sensor', $sensor);
+    }
+
+    public function sensor()
+    {
+        $sensor = ManageStatusModel::select('*')->get();
+        return view('manage.status.4-channel.index-status', [
+            'title' => 'Status'
+        ])->with('sensor', $sensor);
     }
 
     /**

@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('nama_schedule', 250);
             $table->string('waktu1');
             $table->string('waktu2');
-            $table->string('tanggal1');
             $table->string('status')->default('0');
             $table->timestamps();
         });

@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('tb_sensor', function (Blueprint $table) {
             $table->increments('sensor_id');
-            $table->float('voltage');
-            $table->float('current');
-            $table->float('power');
-            $table->float('energy');
-            $table->float('frequency');
-            $table->float('powerfactor');
+            $table->float('voltage')->default('0');
+            $table->float('current')->default('0');
+            $table->float('power')->default('0');
+            $table->float('energy')->default('0');
+            $table->float('frequency')->default('0');
+            $table->float('powerfactor')->default('0');
             $table->timestamps();
         });
     }

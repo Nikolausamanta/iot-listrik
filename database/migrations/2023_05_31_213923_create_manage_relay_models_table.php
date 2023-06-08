@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('tb_relay', function (Blueprint $table) {
             $table->increments('relay_id');
-            $table->boolean('switch');
+            $table->boolean('switch')->default('0');
             $table->timestamps();
         });
     }
