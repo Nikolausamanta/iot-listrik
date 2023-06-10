@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TimerModel;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\MacAddressModel;
 use App\Models\ManageRelayModel;
@@ -65,10 +66,21 @@ class ManageDeviceController extends Controller
 
         $request->validate([
             'device_name' => 'required',
-            'mac_address' => 'required',
+            'mac_address' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $existingData = ManageDeviceModel::where('mac_address', $value)
+                        ->where('user_id', Auth::id())
+                        ->first();
+
+                    if ($existingData) {
+                        $fail('Data 1 has already been added by the current user.');
+                    }
+                },
+            ],
         ], [
-            'device_name.required' => 'diisi woy',
-            'mac_address.required' => 'diisi woy',
+            'device_name.required' => 'The device name field is required.',
+            'mac_address.required' => 'The mac address field is required.',
         ]);
 
         $userID = Auth::id();
@@ -80,22 +92,30 @@ class ManageDeviceController extends Controller
         ];
 
         $deviceId = ManageDeviceModel::insertGetId($data, 'deviceId');
-        // $deviceId = $aaa->device_id;
 
-        $dataRelay = [
-            'device_id' => $deviceId,
-        ];
+        // Check if the device_id has multiple mac_address
+        $existingMacAddresses = ManageDeviceModel::where('mac_address', $request->mac_address)
+            ->where('device_id', '<>', $deviceId)
+            ->pluck('mac_address')
+            ->toArray();
 
-        $dataSensor = [
-            'device_id' => $deviceId,
-        ];
+        if (count($existingMacAddresses) == 0) {
+            $dataRelay = [
+                'device_id' => $deviceId,
+            ];
 
-        ManageRelayModel::create($dataRelay);
-        ManageStatusModel::create($dataSensor);
+            ManageRelayModel::firstOrCreate($dataRelay);
 
+            // $dataSensor = [
+            //     'device_id' => $deviceId,
+            // ];
 
-        return redirect()->to('/alldevice')->with('success', 'berhasil menambahkan device uy');
+            // ManageStatusModel::firstOrCreate($dataSensor);
+        }
+
+        return redirect()->to('/alldevice')->with('success', 'Successfully added the device.');
     }
+
 
     /**
      * Display the specified resource.

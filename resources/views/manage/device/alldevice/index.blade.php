@@ -18,12 +18,12 @@
         </div>
         <div class="col-md-4"></div>
         <div class="col-lg-4">
-            <a href="/room" class="kanan btn btn-outline-primary me-2 mt-3 ">
+            {{-- <a href="/room" class="kanan btn btn-outline-primary me-2 mt-3 ">
                 Rooms
-            </a>
-            <a href="/alldevice" class="kanan btn btn-outline-primary me-2 mt-3">
+            </a> --}}
+            {{-- <a href="/alldevice" class="kanan btn btn-outline-primary me-2 mt-3">
                 All Devices
-            </a>
+            </a> --}}
             <a href="manage-device/create" class="kanan btn btn-primary me-2 mt-3">
                 +
             </a>

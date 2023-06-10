@@ -2,7 +2,30 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <div class="row">
+         {{--? Start Judul Atas --}}
+         <div class="row mt-3">
+            <div class="col-lg-4">
+                
+                <div class="top-title">
+                    <h2 class="">Bathroom</h2>
+                    <p>Have a nice day</p>
+                </div>
+            </div>
+            <div class="col-lg-8">
+              <a href="/timers/{{$device_id}}">
+                  <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
+              </a>
+              <a href="/manage-schedule/{{$device_id}}">
+                  <button type="button" class="kanan btn btn-outline-success me-2">Schedule</button>
+              </a>
+              <a href="/manage-status/{{$device_id}}">
+                  <button type="button" class="kanan btn btn-outline-primary me-2">Status</button>
+              </a>
+            </div>
+          </div>
+          {{--? End Judul Atas --}}
+    
+    <div class="row mt-4">
         <div class="col-lg-3">
             <div class="card">
                 <div class="card-header">
@@ -11,12 +34,12 @@
                 <div class="card-body">
                     <form action="{{ route('timers.store') }}" method="post" role="form text-left">
                         @csrf
-                        <div class="form-group">
+                        <div class="form-group" hidden>
                             <label for="example-text-input" class="form-control-label">Device Id</label>
                             <input type="text" class="form-control" name="device_id" value="{{ $device_id }}" placeholder="Device Id" aria-label="Name" aria-describedby="name-addon">
                         </div>
 
-                        <hr class="horizontal dark">
+                        {{-- <hr class="horizontal dark"> --}}
 
                         <div class="form-group">
                             <label for="duration_hour" class="form-control-label">Hours</label>
@@ -46,9 +69,9 @@
         @else
             @foreach ($timers as $timer)
                 @if ($timer->end_time && $timer->getRemainingTime() > 0)
-                    <div class="col-lg-9 mt-4">
-                        <div class="card py-4 px-8">
-                            <div class="text-center">
+                    <div class="col-lg-9">
+                        <div class="card py-4 px-8" style="height: 28.5rem;">
+                            <div class="text-center" >
                                 <div id="timer-{{ $timer->timer_id }}">
                                     <div class="clock">
                                         <span class="clock-hour">{{ $timer->getRemainingHours() }}</span> hours

@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use App\Models\ManageStatusModel;
-use App\Models\ManageScheduleModel;
 use App\Models\ManageRelayModel;
+use App\Models\ManageDeviceModel;
+use App\Models\ManageStatusModel;
 
+use App\Models\ManageScheduleModel;
 use Illuminate\Support\Facades\Session;
 
 class ManageScheduleController extends Controller
@@ -18,15 +19,15 @@ class ManageScheduleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $data1 = ManageScheduleModel::orderBy('waktu1', 'asc')->limit(1)->get();
-        // dd($data1);
-        $data = ManageScheduleModel::orderBy('updated_at', 'desc')->paginate(6);
-        return view('manage.schedule.4-channel.index-schedule', [
-            'title' => 'Manage Device'
-        ])->with('data_manage_schedule', $data)->with('upcoming', $data1);
-    }
+    // public function index()
+    // {
+    //     $data1 = ManageScheduleModel::orderBy('waktu1', 'asc')->limit(1)->get();
+    //     // dd($data1);
+    //     $data = ManageScheduleModel::orderBy('updated_at', 'desc')->paginate(6);
+    //     return view('manage.schedule.4-channel.index-schedule', [
+    //         'title' => 'Manage Device'
+    //     ])->with('data_manage_schedule', $data)->with('upcoming', $data1);
+    // }
 
     public function tampil(Request $request)
     {
@@ -212,22 +213,34 @@ class ManageScheduleController extends Controller
         date_default_timezone_set('Asia/Singapore');
         $time = time();
 
-        $device_id_session = session('device_id');
-        $data = ManageScheduleModel::where('device_id', $device_id_session)->orderBy('schedule_id', 'asc')->get();
-        // $data = ManageRelayModel::where('device_id', $device_id_session)->get();
-        // $data = ManageScheduleModel::orderBy('schedule_id', 'asc')->get();
+        $session_device_id = session('device_id');
+        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
 
-        foreach ($data as $schedule) {
-            $id = $schedule->schedule_id;
-            $device_id = $schedule->device_id;
-            $jam = $schedule->waktu1;
-            $jam2 = $schedule->waktu2;
+        if ($device) {
+            $mac_address = $device->mac_address;
 
-            if ($device_id == $device_id_session) {
-                if ($time == $jam) {
-                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 1]);
-                } elseif ($time == $jam2) {
-                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 0]);
+            $relay = ManageRelayModel::whereHas('device', function ($query) use ($mac_address) {
+                $query->where('mac_address', $mac_address);
+            })->first();
+
+            if ($relay) {
+                $device_id_relay = $relay->device_id;
+
+                $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('schedule_id', 'asc')->get();
+
+                foreach ($data as $schedule) {
+                    $id = $schedule->schedule_id;
+                    $device_id = $schedule->device_id;
+                    $jam = $schedule->waktu1;
+                    $jam2 = $schedule->waktu2;
+
+                    if ($device_id == $session_device_id) {
+                        if ($time == $jam) {
+                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => ($relay->switch == 0) ? 1 : 0]);
+                        } elseif ($time == $jam2) {
+                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => ($relay->switch == 0) ? 1 : 0]);
+                        }
+                    }
                 }
             }
         }

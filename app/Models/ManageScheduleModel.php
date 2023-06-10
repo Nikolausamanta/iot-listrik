@@ -13,4 +13,9 @@ class ManageScheduleModel extends Model
     // public $timestamps = false;
 
     // protected $casts = ['tanggal' => 'datetime'];
+
+    public function device()
+    {
+        return $this->belongsTo(ManageDeviceModel::class, 'device_id');
+    }
 }

@@ -13,6 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
+
+
         Schema::table('tb_relay', function (Blueprint $table) {
             $table->integer('device_id')->length(10)->unsigned()->after('relay_id')->default('0');
             $table->foreign('device_id')->references('device_id')->on('tb_device');
@@ -23,10 +25,11 @@ return new class extends Migration
             $table->foreign('device_id')->references('device_id')->on('tb_device');
         });
 
-        Schema::table('tb_sensor', function (Blueprint $table) {
-            $table->integer('device_id')->length(10)->unsigned()->after('sensor_id')->default('0');
-            $table->foreign('device_id')->references('device_id')->on('tb_device');
-        });
+
+        // Schema::table('tb_sensor', function (Blueprint $table) {
+        //     $table->integer('device_id')->length(10)->unsigned()->after('sensor_id')->default('0');
+        //     $table->foreign('device_id')->references('device_id')->on('tb_device');
+        // });
 
         Schema::table('tb_timer', function (Blueprint $table) {
             $table->integer('device_id')->length(10)->unsigned()->after('timer_id')->default('0');
@@ -49,9 +52,9 @@ return new class extends Migration
             $table->dropForeign(['device_id']);
         });
 
-        Schema::table('tb_sensor', function (Blueprint $table) {
-            $table->dropForeign(['device_id']);
-        });
+        // Schema::table('tb_sensor', function (Blueprint $table) {
+        //     $table->dropForeign(['device_id']);
+        // });
 
         Schema::table('tb_timer', function (Blueprint $table) {
             $table->dropForeign(['device_id']);

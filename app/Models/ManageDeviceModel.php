@@ -14,6 +14,17 @@ class ManageDeviceModel extends Model
         'mac_address',
         'user_id',
     ];
+    protected $primaryKey = 'device_id';
 
     protected $table = 'tb_device';
+
+    public function relay()
+    {
+        return $this->hasOne(ManageRelayModel::class, 'device_id');
+    }
+
+    public function status()
+    {
+        return $this->hasOne(ManageStatusModel::class, 'device_id');
+    }
 }

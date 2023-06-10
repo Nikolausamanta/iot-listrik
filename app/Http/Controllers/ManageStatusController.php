@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ManageDeviceModel;
 use Illuminate\Http\Request;
 use App\Models\ManageStatusModel;
 use App\Models\ManageRelayModel;
@@ -24,64 +25,110 @@ class ManageStatusController extends Controller
     //     ])->with('data', $data2)->with('sensor', $data);
     // }
 
+
     public function tampil(Request $request)
     {
         $device_id = $request->route('device_id');
+        $device = ManageDeviceModel::where('device_id', $device_id)->first();
 
-        $data1 = ManageStatusModel::where('device_id', $device_id)->get();
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            $data1 = ManageStatusModel::where('mac_address', $mac_address)->latest('updated_at')->take(1)->get();
+        }
+
+
+        // // $data1 = ManageStatusModel::where('device_id', $device_id)->get();
         $data2 = ManageRelayModel::where('device_id', $device_id)->get();
 
         session(['device_id' => $device_id]);
 
-        // return $data2;
+
         return view('manage.status.4-channel.index-status', [
             'title' => 'Status'
-        ])->with('sensor', $data1)->with('data', $data2)->with('device_id', $device_id);
+        ])
+            ->with('sensor', $data1)
+            ->with('data', $data2)
+            ->with('device_id', $device_id);
     }
 
     public function relay($value)
     {
-        $device_id_session = session('device_id');
-        // $data22 = '2';
-        $data = ManageRelayModel::where('device_id', $device_id_session)->get();
-        // return $data;
-        foreach ($data as $relay) {
-            $device_id = $relay->device_id;
-            $relay_id = $relay->relay_id;
-            $switch = $relay->switch;
+        $session_device_id = session('device_id');
+        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
 
-            if ($device_id == $device_id_session) {
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            $relay = ManageRelayModel::whereHas('device', function ($query) use ($mac_address) {
+                $query->where('mac_address', $mac_address);
+            })->first();
+
+            if ($relay) {
+                $device_id = $relay->device_id;
                 if ($value == "on") {
-                    ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 1]);
-                    $hasil = 1;
+                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 1]);
                 } else {
-                    ManageRelayModel::where('relay_id', $relay_id)->update(['switch' => 0]);
-                    $hasil = 0;
+                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 0]);
                 }
             }
         }
-
-        return $hasil;
     }
 
+    public function send()
+    {
+        $relay_id = 1;
+        $dddd = ManageRelayModel::where('relay_id', $relay_id)->pluck('switch');
+        return $dddd[0];
+    }
+
+    public function send_mac_address(Request $request)
+    {
+        $mac_address = $request->route('mac_address');
+        $aaa = ManageDeviceModel::join('tb_relay', 'tb_device.device_id', '=', 'tb_relay.device_id')
+            ->where('tb_device.mac_address', $mac_address)
+            ->distinct()
+            ->pluck('switch')
+            ->implode(', ');
+        // $bbb = join($aaa);
+        return $aaa;
+    }
 
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function simpansensor()
+    public function simpansensor(Request $request)
     {
+        $voltage = $request->route('voltage');
+        $current = $request->route('current');
+        $power = $request->route('power');
+        $energy = $request->route('energy');
+        $frequency = $request->route('frequency');
+        $powerfactor = $request->route('powerfactor');
+        $mac_address = $request->route('mac_address');
 
-        $data = [
-            'voltage' => request()->voltage,
-            'current' => request()->current,
-            'power' => request()->power,
-            'energy' => request()->energy,
-            'frequency' => request()->frequency,
-            'powerfactor' => request()->powerfactor,
-        ];
-        ManageStatusModel::where('sensor_id', '1')->update($data);
+        ManageStatusModel::create([
+            'voltage' => $voltage,
+            'current' => $current,
+            'power' => $power,
+            'energy' => $energy,
+            'frequency' => $frequency,
+            'powerfactor' => $powerfactor,
+            'mac_address' => $mac_address,
+        ]);
+
+        // $data = [
+        //     'voltage' => request()->voltage,
+        //     'current' => request()->current,
+        //     'power' => request()->power,
+        //     'energy' => request()->energy,
+        //     'frequency' => request()->frequency,
+        //     'powerfactor' => request()->powerfactor,
+        // ];
+
+        // ManageStatusModel::where('sensor_id', '1')->update($data);
         // ManageScheduleModel::where('schedule_id', $id)->update($data);
         // $sensor = ManageStatusModel::select('*')->get();
         // return view('manage.status.4-channel.index-status')->with('sensor', $sensor);

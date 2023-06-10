@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('tb_sensor', function (Blueprint $table) {
             $table->increments('sensor_id');
+            $table->string('mac_address');
             $table->float('voltage')->default('0');
             $table->float('current')->default('0');
             $table->float('power')->default('0');

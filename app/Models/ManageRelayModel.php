@@ -12,4 +12,8 @@ class ManageRelayModel extends Model
     protected $table = 'tb_relay';
 
     // public $timestamps = false;
+    public function device()
+    {
+        return $this->belongsTo(ManageDeviceModel::class, 'device_id');
+    }
 }

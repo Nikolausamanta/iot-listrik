@@ -15,6 +15,12 @@ class TimerModel extends Model
     protected $primaryKey = 'timer_id';
     protected $fillable = ['relay_id', 'device_id', 'duration', 'end_time'];
 
+    public function device()
+    {
+        return $this->belongsTo(ManageDeviceModel::class, 'device_id');
+    }
+
+
     public static function createOrUpdate($deviceId, $duration)
     {
         $timer = TimerModel::where('device_id', $deviceId)->first();

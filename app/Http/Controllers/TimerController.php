@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\TimerModel;
 use Illuminate\Http\Request;
 use App\Models\ManageRelayModel;
+use App\Models\ManageDeviceModel;
 use Illuminate\Support\Facades\Log;
 
 class TimerController extends Controller
@@ -72,16 +73,36 @@ class TimerController extends Controller
 
     public function updateSwitch(Request $request, $timer)
     {
-        $dataTimer = TimerModel::where('timer_id', $timer)->get('device_id');
+        // $dataTimer = TimerModel::where('timer_id', $timer)->get('device_id');
 
-        foreach ($dataTimer as $schedule) {
-            $device_id = $schedule->device_id;
-            $relay = ManageRelayModel::where('device_id', $device_id)->first();
+        // foreach ($dataTimer as $schedule) {
+        // $device_id = $schedule->device_id;
+        // $relay = ManageRelayModel::where('device_id', $device_id)->first();
 
-            // Memperbarui nilai switch berdasarkan kondisi yang diberikan
-            $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
+        // Memperbarui nilai switch berdasarkan kondisi yang diberikan
+        // $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
 
-            ManageRelayModel::where('device_id', $device_id)->update(['switch' => $newSwitchValue]);
+        // ManageRelayModel::where('device_id', $device_id)->update(['switch' => $newSwitchValue]);
+        // }
+
+
+        $session_device_id = session('device_id');
+        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            $relay = ManageRelayModel::whereHas('device', function ($query) use ($mac_address) {
+                $query->where('mac_address', $mac_address);
+            })->first();
+
+            if ($relay) {
+                $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
+
+                ManageRelayModel::where('device_id', $relay->device_id)->update(['switch' => $newSwitchValue]);
+
+                // return $newSwitchValue;
+            }
         }
     }
 
