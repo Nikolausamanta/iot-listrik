@@ -5,14 +5,14 @@
     
     {{--? Start Judul Atas --}}
     <div class="row mt-3">
-        <div class="col-lg-4">
+        <div class="col-lg-7">
             
             <div class="top-title">
-                <h2 class="">Bathroom</h2>
+                <h2 class="">{{$device_name}}</h2>
                 <p>Have a nice day</p>
             </div>
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-5">
             <a href="/timers/{{$device_id}}">
                 <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
             </a>
@@ -82,7 +82,7 @@
                                         </div>
                                     </div> --}}
                                     <div class="card-body p-3">
-                                        @foreach ($sensor as $item)  
+                                       
                                             <div class="row">
                                                 {{--? Start 1 --}}
                                                 <div class="col-lg-12 mb-lg-0">
@@ -93,7 +93,7 @@
                                                             </div>
                                                             <div class="d-flex flex-column">
                                                                 <span class="text-sm">Current Consumption</span>
-                                                                <h5 class="text-dark font-weight-bold">{{$item->voltage}} kWh</h5>
+                                                                <h5 class="text-dark font-weight-bold"> kWh</h5>
                                                             </div>
                                                         </li>
                                                     </div>
@@ -101,25 +101,24 @@
                                                 {{--? End 1 --}}
                                                 
                                             </div>
-                                        @endforeach
+                                      
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
                 {{--? End 2 Row --}}
                 
                 {{--? Start Chart Power Consumption  --}}
-                <div class="col-lg-9 mb-lg-0 mb-4">
+                <div class="col-lg-9 mb-lg-0 mb-4" >
                     <div class="card z-index-2 h-100">
                         <div class="card-header pb-0 pt-3 bg-transparent">
                             <h6 class="text-capitalize">Power Consumption</h6>
                         </div>
                         <div class="card-body p-3">
                             <div class="chart">
-                                <canvas id="chart-line" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
+                                <canvas id="power-chart" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -127,8 +126,6 @@
                 {{--? End Chart Power Consumption --}}
             </div>
         </div>
-
-       
     </div>
 
     {{--? Start Sensor  --}}
@@ -145,7 +142,6 @@
                 </div>
             </div> --}}
             <div class="card-body p-3">
-                @foreach ($sensor as $item)  
                     <div class="row">
                         {{--? Start 1 --}}
                         <div class="col-lg-2 mb-lg-0 mb-4">
@@ -156,7 +152,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Voltage</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->voltage}} V</h5>
+                                        <h5 class="text-dark font-weight-bold" id="voltage"> V</h5>
                                     </div>
                                 </li>
                             </div>
@@ -172,7 +168,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Current</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->current}} A</h5>
+                                        <h5 class="text-dark font-weight-bold" id="current"> A</h5>
                                     </div>
                                 </li>
                             </div>
@@ -188,7 +184,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Power</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->power}} W</h5>
+                                        <h5 class="text-dark font-weight-bold" id="power"> W</h5>
                                     </div>
                                 </li>
                             </div>
@@ -204,7 +200,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Energy</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->energy}} J</h5>
+                                        <h5 class="text-dark font-weight-bold" id="energy"> J</h5>
                                     </div>
                                 </li>
                             </div>
@@ -220,7 +216,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Frequency</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->frequency}} Hz</h5>
+                                        <h5 class="text-dark font-weight-bold" id="frequency"> Hz</h5>
                                     </div>
                                 </li>
                             </div>
@@ -236,7 +232,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Power Factor</span>
-                                        <h5  id="refresh-sensor" class="text-dark font-weight-bold">{{$item->powerfactor}}</h5>
+                                        <h5 class="text-dark font-weight-bold" id="powerfactor"></h5>
                                     </div>
                                 </li>
                             </div>
@@ -244,7 +240,6 @@
                         {{--? End 6 --}}
                         
                     </div>
-                @endforeach
             </div>
         </div>
     </div>

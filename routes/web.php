@@ -59,6 +59,7 @@ Route::resource('manage-device', ManageDeviceController::class);
 // Route::resource('alldevice/create', [ManageRelayController::class, 'create']);
 
 Route::resource('analyze', AnalyzeController::class);
+Route::get('analyze/{device_id}', [AnalyzeController::class, 'tampil']);
 
 Route::resource('manage-schedule', ManageScheduleController::class);
 Route::resource('manage-status', ManageStatusController::class);
@@ -76,6 +77,8 @@ Route::get('manage-status/relay/{value}', [ManageStatusController::class, 'relay
 Route::get('manage-status/send/switch', [ManageStatusController::class, 'send']);
 Route::get('manage-status/send/mac-address/{mac_address}', [ManageStatusController::class, 'send_mac_address']);
 
+Route::get('manage-status/get/powerchart', [ManageStatusController::class, 'getPowerChart'])->name('datachart.power');
+Route::get('manage-status/get/cardsensor', [ManageStatusController::class, 'getCardSensor'])->name('datacard.all');
 // Route::get('manage-relay/relay/{value}', [ManageRelayController::class, 'relay']);
 // Route::get('manage-send/', [ManageRelayController::class, 'send']);
 

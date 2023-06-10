@@ -2,29 +2,20 @@
 
 @section('content')
 <div class="container-fluid py-4">
-         {{--? Start Judul Atas --}}
-         <div class="row mt-3">
-            <div class="col-lg-4">
-                
-                <div class="top-title">
-                    <h2 class="">Bathroom</h2>
-                    <p>Have a nice day</p>
-                </div>
+    <div class="row mt-3">
+        <div class="col-lg-7">
+            <div class="top-title">
+                <h2 class="">{{$device_name}}</h2>
+                <p>Have a nice day</p>
             </div>
-            <div class="col-lg-8">
-              <a href="/timers/{{$device_id}}">
-                  <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
-              </a>
-              <a href="/manage-schedule/{{$device_id}}">
-                  <button type="button" class="kanan btn btn-outline-success me-2">Schedule</button>
-              </a>
-              <a href="/manage-status/{{$device_id}}">
-                  <button type="button" class="kanan btn btn-outline-primary me-2">Status</button>
-              </a>
-            </div>
-          </div>
-          {{--? End Judul Atas --}}
-    
+        </div>
+        <div class="col-lg-5">
+            <a href="/timers/{{$device_id}}" class="kanan btn btn-outline-info me-2">Countdown</a>
+            <a href="/manage-schedule/{{$device_id}}" class="kanan btn btn-outline-success me-2">Schedule</a>
+            <a href="/manage-status/{{$device_id}}" class="kanan btn btn-outline-primary me-2">Status</a>
+        </div>
+    </div>
+
     <div class="row mt-4">
         <div class="col-lg-3">
             <div class="card">
@@ -32,14 +23,9 @@
                     Set Timer
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('timers.store') }}" method="post" role="form text-left">
+                    <form id="set-timer-form" action="{{ route('timers.store') }}" method="post" role="form text-left">
                         @csrf
-                        <div class="form-group" hidden>
-                            <label for="example-text-input" class="form-control-label">Device Id</label>
-                            <input type="text" class="form-control" name="device_id" value="{{ $device_id }}" placeholder="Device Id" aria-label="Name" aria-describedby="name-addon">
-                        </div>
-
-                        {{-- <hr class="horizontal dark"> --}}
+                        <input type="hidden" name="device_id" value="{{ $device_id }}">
 
                         <div class="form-group">
                             <label for="duration_hour" class="form-control-label">Hours</label>
@@ -63,95 +49,92 @@
         </div>
 
         @if ($timers->isEmpty())
-            <div class="col-lg-9">
-                <p>No timers found.</p>
-            </div>
+        <div class="col-lg-9">
+            <p>No timers found.</p>
+        </div>
         @else
-            @foreach ($timers as $timer)
-                @if ($timer->end_time && $timer->getRemainingTime() > 0)
-                    <div class="col-lg-9">
-                        <div class="card py-4 px-8" style="height: 28.5rem;">
-                            <div class="text-center" >
-                                <div id="timer-{{ $timer->timer_id }}">
-                                    <div class="clock">
-                                        <span class="clock-hour">{{ $timer->getRemainingHours() }}</span> hours
-                                        <span class="clock-minute">{{ $timer->getRemainingMinutes() }}</span> minutes
-                                        <span class="clock-second">{{ $timer->getRemainingSeconds() }}</span> seconds remaining
-                                    </div>
-                                    <form action="{{ route('timers.cancel', $timer) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger btn-lg btn-rounded w-100 mt-4 mb-0">Cancel</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+        @foreach ($timers as $timer)
+        <div class="col-lg-9">
+            <div class="card" style="height: 28.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div class="text-center">
+                    <div class="clock">
+                        <span class="clock-hour" id="clock-hour-{{ $timer->timer_id }}">{{ $timer->getRemainingHours() }}</span> &ensp; hours &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                        <span class="clock-minute" id="clock-minute-{{ $timer->timer_id }}">{{ $timer->getRemainingMinutes() }}</span> &ensp; minutes &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                        <span class="clock-second" id="clock-second-{{ $timer->timer_id }}">{{ $timer->getRemainingSeconds() }}</span> &ensp; seconds
                     </div>
-                    <script>
-                        // JavaScript code for countdown and switch update
-                        var timerElement{{ $timer->timer_id }} = document.getElementById('timer-{{ $timer->timer_id }}');
-                        var clockHour{{ $timer->timer_id }} = timerElement{{ $timer->timer_id }}.querySelector('.clock-hour');
-                        var clockMinute{{ $timer->timer_id }} = timerElement{{ $timer->timer_id }}.querySelector('.clock-minute');
-                        var clockSecond{{ $timer->timer_id }} = timerElement{{ $timer->timer_id }}.querySelector('.clock-second');
-                        var remainingTime{{ $timer->timer_id }} = {
-                            hours: {{ $timer->getRemainingHours() }},
-                            minutes: {{ $timer->getRemainingMinutes() }},
-                            seconds: {{ $timer->getRemainingSeconds() }} 
-                        };
+                    <form action="{{ route('timers.cancel', $timer) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-lg btn-rounded w-100 mt-4 mb-0">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-                        function countdown{{ $timer->timer_id }}() {
-                            if (remainingTime{{ $timer->timer_id }}.seconds > 0) {
-                                remainingTime{{ $timer->timer_id }}.seconds--;
-                            } else {
-                                if (remainingTime{{ $timer->timer_id }}.minutes > 0) {
-                                    remainingTime{{ $timer->timer_id }}.minutes--;
-                                    remainingTime{{ $timer->timer_id }}.seconds = 59;
-                                } else {
-                                    if (remainingTime{{ $timer->timer_id }}.hours > 0) {
-                                        remainingTime{{ $timer->timer_id }}.hours--;
-                                        remainingTime{{ $timer->timer_id }}.minutes = 59;
-                                        remainingTime{{ $timer->timer_id }}.seconds = 59;
-                                    } else {
-                                        clearInterval(timerInterval{{ $timer->timer_id }});
-                                        updateSwitch('{{ route('timers.updateSwitch', $timer) }}');
-                                        timerElement{{ $timer->timer_id }}.parentNode.removeChild(timerElement{{ $timer->timer_id }});
-                                    }
-                                }
-                            }
+        @if ($timer->end_time && $timer->getRemainingTime() > 0)
+        <script>
+            var timer{{ $timer->timer_id }} = {
+                hourElement: document.getElementById('clock-hour-{{ $timer->timer_id }}'),
+                minuteElement: document.getElementById('clock-minute-{{ $timer->timer_id }}'),
+                secondElement: document.getElementById('clock-second-{{ $timer->timer_id }}'),
+                remainingTime: {
+                    hours: {{ $timer->getRemainingHours() }},
+                    minutes: {{ $timer->getRemainingMinutes() }},
+                    seconds: {{ $timer->getRemainingSeconds() }}
+                }
+            };
 
-                            clockHour{{ $timer->timer_id }}.textContent = remainingTime{{ $timer->timer_id }}.hours;
-                            clockMinute{{ $timer->timer_id }}.textContent = remainingTime{{ $timer->timer_id }}.minutes;
-                            clockSecond{{ $timer->timer_id }}.textContent = remainingTime{{ $timer->timer_id }}.seconds;
+            function countdown{{ $timer->timer_id }}() {
+                var remainingTime = timer{{ $timer->timer_id }}.remainingTime;
+                if (remainingTime.seconds > 0) {
+                    remainingTime.seconds--;
+                } else if (remainingTime.minutes > 0) {
+                    remainingTime.minutes--;
+                    remainingTime.seconds = 59;
+                } else if (remainingTime.hours > 0) {
+                    remainingTime.hours--;
+                    remainingTime.minutes = 59;
+                    remainingTime.seconds = 59;
+                } else {
+                    clearInterval(timerInterval{{ $timer->timer_id }});
+                    updateSwitch('{{ route('timers.updateSwitch', $timer) }}');
+                    document.getElementById('timer-{{ $timer->timer_id }}').setAttribute('hidden', 'hidden');
+                }
+
+                timer{{ $timer->timer_id }}.hourElement.textContent = padZero(remainingTime.hours);
+                timer{{ $timer->timer_id }}.minuteElement.textContent = padZero(remainingTime.minutes);
+                timer{{ $timer->timer_id }}.secondElement.textContent = padZero(remainingTime.seconds);
+            }
+
+            function updateSwitch(url) {
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         }
-
-                        function updateSwitch(url) {
-                            fetch(url, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        console.log('Switch updated successfully');
-                                    } else {
-                                        console.log('Failed to update switch');
-                                    }
-                                })
-                                .catch(error => {
-                                    console.log('An error occurred:', error);
-                                });
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Switch updated successfully');
+                        } else {
+                            console.log('Failed to update switch');
                         }
+                    })
+                    .catch(error => {
+                        console.log('An error occurred:', error);
+                    });
+            }
 
-                        var timerInterval{{ $timer->timer_id }} = setInterval(countdown{{ $timer->timer_id }}, 1000);
-                    </script>
-                @endif
-            @endforeach
+            function padZero(number) {
+                return number.toString().padStart(2, '0');
+            }
+
+            var timerInterval{{ $timer->timer_id }} = setInterval(countdown{{ $timer->timer_id }}, 1000);
+        </script>
+        @endif
+        @endforeach
         @endif
     </div>
 </div>
-
-
-
 @endsection

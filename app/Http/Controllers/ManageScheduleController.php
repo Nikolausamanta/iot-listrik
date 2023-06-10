@@ -32,6 +32,7 @@ class ManageScheduleController extends Controller
     public function tampil(Request $request)
     {
         $device_id = $request->route('device_id');
+        $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
 
         $data1 = ManageScheduleModel::where('device_id', $device_id)->orderBy('updated_at', 'desc')->paginate(6);
         $data2 = ManageScheduleModel::where('device_id', $device_id)->orderBy('waktu1', 'asc')->limit(1)->get();
@@ -42,8 +43,9 @@ class ManageScheduleController extends Controller
         // return $data2;
         return view('manage.schedule.4-channel.index-schedule', [
             'title' => 'Status'
-        ])->with('data_manage_schedule', $data1)->with('upcoming', $data2)->with('device_id', $device_id);
+        ])->with('data_manage_schedule', $data1)->with('upcoming', $data2)->with('device_id', $device_id)->with('device_name', $device_name);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -225,6 +227,7 @@ class ManageScheduleController extends Controller
 
             if ($relay) {
                 $device_id_relay = $relay->device_id;
+                $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
 
                 $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('schedule_id', 'asc')->get();
 
@@ -236,9 +239,9 @@ class ManageScheduleController extends Controller
 
                     if ($device_id == $session_device_id) {
                         if ($time == $jam) {
-                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => ($relay->switch == 0) ? 1 : 0]);
+                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $newSwitchValue]);
                         } elseif ($time == $jam2) {
-                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => ($relay->switch == 0) ? 1 : 0]);
+                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $newSwitchValue]);
                         }
                     }
                 }

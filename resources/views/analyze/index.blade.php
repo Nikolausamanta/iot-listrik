@@ -14,26 +14,20 @@
             </div>
         </div>
         <div class="col-lg-10 mb-lg-0 mb-4">
-            <a href="/room" class="kanan btn btn-outline-primary me-2 mt-3 ">
-                All
+        
+        @foreach ($data as $row)
+            <a href="{{url('analyze/'.$row->device_id)}}" class="kanan btn btn-outline-primary me-2 mt-3 ">
+                {{ $row->device_name }}
             </a>
-            <a href="/room" class="kanan btn btn-outline-primary me-2 mt-3 ">
-                Rooms
-            </a>
-            <a href="/room" class="kanan btn btn-outline-primary me-2 mt-3 ">
-                Rooms
-            </a>
-            <a href="/room" class="kanan btn btn-outline-primary me-2 mt-3 ">
-                Rooms
-            </a>
-            <a href="/alldevice" class="kanan btn btn-outline-primary me-2 mt-3">
-                All Devices
-            </a>
+        @endforeach
+        <a href="analyze/" class="kanan btn btn-outline-primary me-2 mt-3 ">
+            All Device
+        </a>
         </div>
     </div>
     {{--? End Judul Atas  --}}
 
-    {{--? Start Chart Power Consumption  --}}
+    {{--? Start Chart Coast --}}
     <div class="row mt-4">
         <div class="col-lg-12 mb-lg-0 mb-4">
             <div class="card z-index-2 h-100">
@@ -48,9 +42,9 @@
             </div>
         </div>
     </div>
-    {{--? End Chart Power Consumption --}}
-    {{--? End Card Content 1 Column  --}}
+    {{--? End Chart Coast--}}
 
+    {{--? End Card Content 1 Column  --}}
     <div class="row mt-4">
         <div class="col-lg-6">
             <div class="card mb-3">
@@ -71,7 +65,7 @@
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
-                        <canvas id="bar-chart-horizontal" class="chart-canvas" height="337" width="662" style="display: block; box-sizing: border-box; height: 300px; width: 588.8px;"></canvas>
+                        <canvas id="" class="chart-canvas" height="337" width="662" style="display: block; box-sizing: border-box; height: 300px; width: 588.8px;"></canvas>
                     </div>
                 </div>
             </div>

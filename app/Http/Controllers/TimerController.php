@@ -29,12 +29,13 @@ class TimerController extends Controller
     {
         $device_id = $request->route('device_id');
         $timers = TimerModel::where('device_id', $device_id)->get();
+        $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
 
         session(['device_id' => $device_id]);
 
         return view('timer.index', [
             'title' => 'Status'
-        ], compact('timers'))->with('device_id', $device_id);
+        ], compact('timers'))->with('device_id', $device_id)->with('device_name', $device_name);
     }
 
     public function store(Request $request)
@@ -105,6 +106,7 @@ class TimerController extends Controller
             }
         }
     }
+
 
 
     /**

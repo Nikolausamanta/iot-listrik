@@ -6,14 +6,14 @@
 
      {{--? Start Judul Atas --}}
      <div class="row mt-3">
-      <div class="col-lg-4">
+      <div class="col-lg-7">
           
           <div class="top-title">
-              <h2 class="">Bathroom</h2>
+              <h2 class="">{{$device_name}}</h2>
               <p>Have a nice day</p>
           </div>
       </div>
-      <div class="col-lg-8">
+      <div class="col-lg-5">
         <a href="/timers/{{$device_id}}">
             <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
         </a>

@@ -15,12 +15,6 @@ class TimerModel extends Model
     protected $primaryKey = 'timer_id';
     protected $fillable = ['relay_id', 'device_id', 'duration', 'end_time'];
 
-    public function device()
-    {
-        return $this->belongsTo(ManageDeviceModel::class, 'device_id');
-    }
-
-
     public static function createOrUpdate($deviceId, $duration)
     {
         $timer = TimerModel::where('device_id', $deviceId)->first();
@@ -57,16 +51,19 @@ class TimerModel extends Model
 
     public function getRemainingHours()
     {
-        return floor($this->getRemainingTime() / 3600);
+        $hours = floor($this->getRemainingTime() / 3600);
+        return str_pad($hours, 2, '0', STR_PAD_LEFT); // Mengubah format menjadi dua digit dengan padding nol di depan jika diperlukan
     }
 
     public function getRemainingMinutes()
     {
-        return floor(($this->getRemainingTime() % 3600) / 60);
+        $minutes = floor(($this->getRemainingTime() % 3600) / 60);
+        return str_pad($minutes, 2, '0', STR_PAD_LEFT); // Mengubah format menjadi dua digit dengan padding nol di depan jika diperlukan
     }
 
     public function getRemainingSeconds()
     {
-        return $this->getRemainingTime() % 60;
+        $seconds = $this->getRemainingTime() % 60;
+        return str_pad($seconds, 2, '0', STR_PAD_LEFT); // Mengubah format menjadi dua digit dengan padding nol di depan jika diperlukan
     }
 }

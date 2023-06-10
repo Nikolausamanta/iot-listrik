@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ManageDeviceModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Models\ManageStatusModel;
 use App\Models\ManageRelayModel;
+use App\Models\ManageDeviceModel;
+use App\Models\ManageStatusModel;
 
 
 class ManageStatusController extends Controller
@@ -29,13 +30,13 @@ class ManageStatusController extends Controller
     public function tampil(Request $request)
     {
         $device_id = $request->route('device_id');
-        $device = ManageDeviceModel::where('device_id', $device_id)->first();
+        $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
 
-        if ($device) {
-            $mac_address = $device->mac_address;
+        // if ($device) {
+        //     $mac_address = $device->mac_address;
 
-            $data1 = ManageStatusModel::where('mac_address', $mac_address)->latest('updated_at')->take(1)->get();
-        }
+        //     $data1 = ManageStatusModel::where('mac_address', $mac_address)->latest('updated_at')->take(1)->get();
+        // }
 
 
         // // $data1 = ManageStatusModel::where('device_id', $device_id)->get();
@@ -43,14 +44,57 @@ class ManageStatusController extends Controller
 
         session(['device_id' => $device_id]);
 
-
         return view('manage.status.4-channel.index-status', [
             'title' => 'Status'
         ])
-            ->with('sensor', $data1)
+            ->with('device_name', $device_name)
             ->with('data', $data2)
             ->with('device_id', $device_id);
     }
+
+    public function getPowerChart()
+    {
+        $session_device_id = session('device_id');
+        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            $data = ManageStatusModel::where('mac_address', $mac_address)
+                ->latest('updated_at')
+                ->take(15)
+                ->select('power', 'updated_at')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'power' => $item->power,
+                        'updated_at' => Carbon::parse($item->updated_at)->format('H:i:s')
+                    ];
+                });
+
+            return response()->json($data);
+        }
+    }
+
+
+
+    public function getCardSensor(Request $request)
+    {
+        $session_device_id = $request->session()->get('device_id');
+        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            $data = ManageStatusModel::where('mac_address', $mac_address)
+                ->latest('updated_at')
+                ->select('voltage', 'current', 'power', 'energy', 'frequency', 'powerfactor')
+                ->first();
+
+            return response()->json($data);
+        }
+    }
+
 
     public function relay($value)
     {
