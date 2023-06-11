@@ -1,7 +1,7 @@
-var updated_at = []; // Array untuk menyimpan label waktu
+    var updated_at = []; // Array untuk menyimpan label waktu
     var power = []; // Array untuk menyimpan data power
 
-    // Inisialisasi grafik
+    // Chart Power (ID)
     var ctx1 = document.getElementById("power-chart").getContext("2d");
     var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
 
@@ -131,8 +131,3 @@ var updated_at = []; // Array untuk menyimpan label waktu
     setInterval(fetchCardSensor, 2000);
     setInterval(fetchDataPowerChart, 2000);
 
-
-
-    
-
-    

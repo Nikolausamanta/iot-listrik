@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ManageRelayModel;
 use App\Models\ManageDeviceModel;
 use App\Models\ManageStatusModel;
-
+use Symfony\Component\VarDumper\VarDumper;
 
 class ManageStatusController extends Controller
 {
@@ -51,6 +51,8 @@ class ManageStatusController extends Controller
             ->with('data', $data2)
             ->with('device_id', $device_id);
     }
+
+
 
     public function getPowerChart()
     {
@@ -153,29 +155,28 @@ class ManageStatusController extends Controller
         $powerfactor = $request->route('powerfactor');
         $mac_address = $request->route('mac_address');
 
-        ManageStatusModel::create([
-            'voltage' => $voltage,
-            'current' => $current,
-            'power' => $power,
-            'energy' => $energy,
-            'frequency' => $frequency,
-            'powerfactor' => $powerfactor,
-            'mac_address' => $mac_address,
-        ]);
+        // Mengalikan nilai energy dengan 0.0005555556
+        $kw = $power / 500;
+        // $kwh = $kw * 0.0005555556;
+        var_dump($energy);
+        // Create a new TbSensor model
+        $tbSensor = new ManageStatusModel();
+        $tbSensor->mac_address = $mac_address;
+        $tbSensor->power = $power;
+        $tbSensor->current = $current;
+        $tbSensor->energy = $energy; // Menggunakan nilai energi yang sudah dikalikan
+        $tbSensor->frequency = $frequency;
+        $tbSensor->powerfactor = $powerfactor;
+        $tbSensor->voltage = $voltage;
+        $tbSensor->kwh = $kw;
+        $tbSensor->created_at = now();
 
-        // $data = [
-        //     'voltage' => request()->voltage,
-        //     'current' => request()->current,
-        //     'power' => request()->power,
-        //     'energy' => request()->energy,
-        //     'frequency' => request()->frequency,
-        //     'powerfactor' => request()->powerfactor,
-        // ];
+        $tbSensor->save();
+        // $tbSensor->kwh = ;
+        // var_dump($tbSensor->kwh);
+        // Save the data to the database
 
-        // ManageStatusModel::where('sensor_id', '1')->update($data);
-        // ManageScheduleModel::where('schedule_id', $id)->update($data);
-        // $sensor = ManageStatusModel::select('*')->get();
-        // return view('manage.status.4-channel.index-status')->with('sensor', $sensor);
+        // return response()->json(['kwh' => $tbSensor->kwh], 200);
     }
 
     public function sensor()

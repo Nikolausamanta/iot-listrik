@@ -14,7 +14,9 @@
             </div>
         </div>
         <div class="col-lg-10 mb-lg-0 mb-4">
-        
+            <h5>{{$totalkwh}}</h5>
+        <h6 id="totalCost"></h6>
+
         @foreach ($data as $row)
             <a href="{{url('analyze/'.$row->device_id)}}" class="kanan btn btn-outline-primary me-2 mt-3 ">
                 {{ $row->device_name }}
@@ -36,7 +38,7 @@
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
-                        <canvas id="chart-line" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
+                        <canvas id="" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -49,11 +51,11 @@
         <div class="col-lg-6">
             <div class="card mb-3">
                 <div class="card-header pb-0 pt-3 bg-transparent">
-                    <h6 class="text-capitalize">Electricity Cost</h6>
+                    <h6 class="text-capitalize">Current Cost</h6>
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
-                        <canvas id="bar-chart-horizontal" class="chart-canvas" height="337" width="662" style="display: block; box-sizing: border-box; height: 300px; width: 588.8px;"></canvas>
+                        <canvas id="kwh_chart" class="chart-canvas" height="337" width="662"></canvas>
                     </div>
                 </div>
             </div>
@@ -65,7 +67,7 @@
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
-                        <canvas id="" class="chart-canvas" height="337" width="662" style="display: block; box-sizing: border-box; height: 300px; width: 588.8px;"></canvas>
+                        <canvas id="all-power-chart" class="chart-canvas" height="337" width="662" style="display: block; box-sizing: border-box; height: 300px; width: 588.8px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -89,8 +91,7 @@
                     </div>
                 </div>
             </div> --}}
-            <div class="card-body p-3">
-                @foreach ($data as $item)  
+             <div class="card-body p-3">
                     <div class="row">
                         {{--? Start 1 --}}
                         <div class="col-lg-2 mb-lg-0 mb-4">
@@ -101,7 +102,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Voltage</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->voltage}} kWh</h5>
+                                        <h5 class="text-dark font-weight-bold" id="total-voltage"> V</h5>
                                     </div>
                                 </li>
                             </div>
@@ -117,7 +118,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Current</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->current}} kWh</h5>
+                                        <h5 class="text-dark font-weight-bold" id="total-current"> A</h5>
                                     </div>
                                 </li>
                             </div>
@@ -133,7 +134,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Power</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->power}} kWh</h5>
+                                        <h5 class="text-dark font-weight-bold" id="total-power"> W</h5>
                                     </div>
                                 </li>
                             </div>
@@ -149,7 +150,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Energy</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->energy}} kWh</h5>
+                                        <h5 class="text-dark font-weight-bold" id="total-energy"> J</h5>
                                     </div>
                                 </li>
                             </div>
@@ -165,7 +166,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Frequency</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->frequency}} kWh</h5>
+                                        <h5 class="text-dark font-weight-bold" id="total-frequency"> Hz</h5>
                                     </div>
                                 </li>
                             </div>
@@ -181,7 +182,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-sm">Power Factor</span>
-                                        <h5 class="text-dark font-weight-bold">{{$item->powerfactor}} kWh</h5>
+                                        <h5 class="text-dark font-weight-bold" id="total-power-factor"></h5>
                                     </div>
                                 </li>
                             </div>
@@ -189,7 +190,6 @@
                         {{--? End 6 --}}
                         
                     </div>
-                @endforeach
             </div>
         </div>
     </div>

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->float('energy')->default('0');
             $table->float('frequency')->default('0');
             $table->float('powerfactor')->default('0');
+            $table->float('kwh')->nullable();
             $table->timestamps();
         });
     }

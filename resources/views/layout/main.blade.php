@@ -50,6 +50,7 @@
     <script src={{ url('assets/js/plugins/smooth-scrollbar.min.js') }}></script>
     <script src={{ url('assets/js/plugins/chartjs.min.js') }}></script>
     <script src={{ url('assets/js/chart/chart.js') }}></script>
+    <script src={{ url('assets/js/chart/all_chart_device.js') }}></script>
 
    
     <script>

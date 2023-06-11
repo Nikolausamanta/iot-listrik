@@ -24,18 +24,20 @@ function ubahstatus3(value)
 
 
 $(document).ready(function() {
-    setInterval(function() {
-        $.ajax({
-            url: '/ubahstatus',
-            type: 'GET',
-            success: function(response) {
-                // Tambahkan logika untuk menangani respons dari server
-            },
-            error: function(xhr, status, error) {
-                console.log(xhr.responseText);
-            }
-        });
-    }, 999); // Set interval waktu per detik (1000 ms = 1 detik)
+    if ($('#schedule-refresh').length > 0) {
+        setInterval(function() {
+            $.ajax({
+                url: '/ubahstatus',
+                type: 'GET',
+                success: function(response) {
+                    // Tambahkan logika untuk menangani respons dari server
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                }
+            });
+        }, 999); // Set interval waktu per detik (1000 ms = 1 detik)
+    }
 });
 
 
@@ -52,24 +54,20 @@ const minute = document.getElementById('minute');
 const seconds = document.getElementById('seconds');
 
 const clock = setInterval(function time() {
-    let dateToday = new Date();
-    let hr = dateToday.getHours(); 
-    let min = dateToday.getMinutes(); 
-    let sec = dateToday.getSeconds(); 
+  let dateToday = new Date();
+  let hr = dateToday.getHours();
+  let min = dateToday.getMinutes();
+  let sec = dateToday.getSeconds();
 
-    if(hr <10){
-        hr = '0' + hr;
-    }
-    if(min <10){
-        min = '0' + min;
-    }
-    if(sec <10){
-        sec = '0' + sec;
-    }
-
+  if (hour !== null) {
     hour.textContent = hr;
+  }
+  if (minute !== null) {
     minute.textContent = min;
+  }
+  if (seconds !== null) {
     seconds.textContent = sec;
+  }
 }, 999);
 
 
