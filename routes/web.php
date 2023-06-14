@@ -66,8 +66,10 @@ Route::resource('manage-status', ManageStatusController::class);
 Route::resource('manage-relay', ManageRelayController::class);
 Route::resource('manage-countdown', TimerController::class);
 Route::get('analyze/get/allpowerchart', [AnalyzeController::class, 'getPowerChart']);
-Route::get('analyze/get/allpowercard', [AnalyzeController::class, 'getPowerChart']);
+// Route::get('analyze/get/allpowercard', [AnalyzeController::class, 'getPowerChart']);
 Route::get('analyze/get/kwh', [AnalyzeController::class, 'getTotalKwh']);
+Route::get('analyze/get/kwhmonth', [AnalyzeController::class, 'getTotalKwhPerMonth']);
+Route::get('analyze/get/forecast', [AnalyzeController::class, 'forecast']);
 
 // Route::get('manage-relay/send', 'ManageRelayController@index');
 // Route::get('manage-relay/relay', [ManageRelayController::class, 'relay']);

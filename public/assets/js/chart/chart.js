@@ -40,6 +40,9 @@
         },
         scales: {
           y: {
+            offset: true, // Mengaktifkan offset pada skala sumbu Y
+            suggestedMin: Math.min(...power) - 2, // Atur tinggi minimal (minimum height) berdasarkan data power
+            suggestedMax: Math.max(...power) + 2, // Atur tinggi maksimal (maximum height) berdasarkan data power
             grid: {
               drawBorder: false,
               display: true,
@@ -68,7 +71,6 @@
               borderDash: [5, 5]
             },
             ticks: {
-                
               display: true,
               color: '#ccc',
               padding: 20,
@@ -84,17 +86,36 @@
         }
       }
     });
+    let fetchTimerId = null;
 
-    // Fungsi untuk mengambil data dari server
-    function fetchDataPowerChart() {
-      fetch('/manage-status/get/powerchart')
+    function fetchData() {
+      // Hentikan timeout sebelumnya (jika ada)
+      clearTimeout(fetchTimerId);
+    
+      fetch('/manage-status/get/cardsensor')
         .then(response => response.json())
-        .then(data => {
-            console.log(data)
+        .then(cardSensorData => {
+          console.log(cardSensorData);
+    
+          // Perbarui data Card Sensor
+          document.getElementById('voltage').textContent = cardSensorData.voltage || 'N/A';
+          document.getElementById('current').textContent = cardSensorData.current || 'N/A';
+          document.getElementById('power').textContent = cardSensorData.power || 'N/A';
+          document.getElementById('energy').textContent = cardSensorData.energy || 'N/A';
+          document.getElementById('frequency').textContent = cardSensorData.frequency || 'N/A';
+          document.getElementById('powerfactor').textContent = cardSensorData.powerfactor || 'N/A';
+    
+          // Kirim permintaan powerchart setelah permintaan cardsensor selesai
+          return fetch('/manage-status/get/powerchart');
+        })
+        .then(response => response.json())
+        .then(powerChartData => {
+          console.log(powerChartData);
+    
           // Perbarui data grafik
-          updated_at = data.map(item => item.updated_at);
-          power = data.map(item => item.power);
-
+          updated_at = powerChartData.map(item => item.updated_at);
+          power = powerChartData.map(item => item.power);
+    
           // Perbarui data dan label pada grafik Chart.js
           chart.data.labels = updated_at;
           chart.data.datasets[0].data = power;
@@ -102,32 +123,13 @@
           chart.update();
         })
         .catch(error => {
-            console.error('Error fetching data from server:', error);
+          console.error('Error fetching data:', error);
+        })
+        .finally(() => {
+          // Mulai timeout baru setelah permintaan selesai
+          fetchTimerId = setTimeout(fetchData, 0);
         });
     }
-
-    function fetchCardSensor() {
-        fetch('/manage-status/get/cardsensor')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            document.getElementById('voltage').textContent = data.voltage || 'N/A';
-            document.getElementById('current').textContent = data.current || 'N/A';
-            document.getElementById('power').textContent = data.power || 'N/A';
-            document.getElementById('energy').textContent = data.energy || 'N/A';
-            document.getElementById('frequency').textContent = data.frequency || 'N/A';
-            document.getElementById('powerfactor').textContent = data.powerfactor || 'N/A';
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-      }
-
+    
     // Ambil data pertama kali saat halaman dimuat
-    fetchCardSensor();
-    fetchDataPowerChart();
-
-    // Perbarui data setiap detik menggunakan setInterval
-    setInterval(fetchCardSensor, 2000);
-    setInterval(fetchDataPowerChart, 2000);
-
+    fetchData();
