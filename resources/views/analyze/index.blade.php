@@ -43,6 +43,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="col-lg-7 mb-lg-0 mb-4">
             <div class="card z-index-2 h-100">
                 <div class="card-header pb-0 pt-3 bg-transparent">
@@ -50,7 +51,7 @@
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
-                        <canvas id="kwh_chart" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
+                        <canvas id="line-chart-gradient" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
                     </div>
                 </div>
             </div>

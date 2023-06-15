@@ -55,30 +55,17 @@ class AnalyzeController extends Controller
 
     public function forecast()
     {
-        $user_id = Auth::id();
+        // Ambil data historis biaya listrik dari database
+        $readings = ManageStatusModel::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(kwh) as total_kwh')
+            ->groupBy('year', 'month')
+            ->get();
 
-        $electricityData = Cache::remember('electricity_data_' . $user_id, Carbon::now()->addHours(1), function () use ($user_id) {
-            $kwhPerUser = DB::table('tb_device')
-                ->join('tb_sensor', 'tb_device.mac_address', '=', 'tb_sensor.mac_address')
-                ->where('tb_device.user_id', $user_id)
-                ->groupBy('tb_device.user_id', DB::raw('YEAR(tb_sensor.created_at)'), DB::raw('MONTH(tb_sensor.created_at)'))
-                ->select(
-                    'tb_device.user_id',
-                    DB::raw('YEAR(tb_sensor.created_at) as year'),
-                    DB::raw('MONTH(tb_sensor.created_at) as month'),
-                    DB::raw('SUM(tb_sensor.kwh) as total_kwh')
-                )
-                ->get();
+        $electricityData = [];
 
-            $electricityData = [];
-
-            foreach ($kwhPerUser as $reading) {
-                $kwh = $reading->total_kwh * (1 / 2582);
-                $electricityData[] = $kwh * 1352;
-            }
-
-            return $electricityData;
-        });
+        foreach ($readings as $reading) {
+            $kwh = $reading->total_kwh * (1 / 2582);
+            $electricityData[] = $kwh * 1352;
+        }
 
         // Menghitung jumlah data
         $dataCount = count($electricityData);
@@ -106,8 +93,24 @@ class AnalyzeController extends Controller
         $nextMonth = $dataCount + 1;
         $prediction = $slope * $nextMonth + $intercept;
 
-        // Menampilkan prediksi biaya listrik bulan berikutnya
-        return $prediction;
+        // Menyiapkan data aktual dan prediksi setiap bulan
+        $monthlyData = [];
+        for ($i = 0; $i < $dataCount; $i++) {
+            $monthlyData[] = [
+                'month' => $i + 1,
+                'actual' => $y[$i],
+                'predicted' => $slope * ($i + 1) + $intercept,
+            ];
+        }
+
+        // Menambahkan data prediksi untuk bulan berikutnya
+        $monthlyData[] = [
+            'month' => $nextMonth,
+            'actual' => null,
+            'predicted' => $prediction,
+        ];
+
+        return $monthlyData;
     }
 
     public function getTotalKwhThisMonth()

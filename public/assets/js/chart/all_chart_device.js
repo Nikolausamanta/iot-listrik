@@ -1,14 +1,11 @@
-var updated_at = []; // Array untuk menyimpan label waktu
-var updated_at_kwh = []; // Array untuk menyimpan label waktu
-var power = []; // Array untuk menyimpan data power
-var kwh = []; // Array untuk menyimpan label waktu
+var updated_at = []; 
+var power = [];
 
-var device_name = []; // Array untuk menyimpan data power
-var total_kwh_perdevice = []; // Array untuk menyimpan data power
+var device_name = [];
+var total_kwh_perdevice = [];
 
 // Chart Power (ID)
 var ctx1 = document.getElementById("all-power-chart").getContext("2d");
-var ctx2 = document.getElementById("kwh_chart").getContext("2d");
 var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
 
 gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
@@ -91,66 +88,6 @@ var chart = new Chart(ctx1, {
       }
     }
   }
-});
-
-var kwh_chart = new Chart(ctx2, {
-  type: "bar",
-  data: {
-    labels: [],
-    datasets: [{
-      label: "Rp",
-      weight: 5,
-      borderWidth: 0,
-      borderRadius: 4,
-      backgroundColor: '#3A416F',
-      fill: true,
-      data: [],
-      maxBarThickness: 35
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false
-      }
-    },
-    interaction: {
-      intersect: false,
-      mode: 'index'
-    },
-    scales: {
-      y: {
-        grid: {
-          drawBorder: false,
-          display: true,
-          drawOnChartArea: true,
-          drawTicks: false,
-          borderDash: [5, 5]
-        },
-        ticks: {
-          display: true,
-          padding: 10,
-          color: '#9ca2b7'
-        }
-      },
-      x: {
-        grid: {
-          drawBorder: false,
-          display: false,
-          drawOnChartArea: true,
-          drawTicks: true,
-        },
-        ticks: {
-          display: true,
-          color: '#9ca2b7',
-          padding: 10
-        },
-        reverse: true,
-      },
-    },
-  },
 });
 
 // Bar chart horizontal
@@ -259,23 +196,6 @@ function fetchDataPowerChart() {
     });
 }
 
-function fetchChartKwhCost() {
-  fetch('/analyze/get/kwh')
-    .then(response => response.json())
-    .then(data => {
-      const totalKwh = data.total_kwh;
-      const created_at = data.created_at;
-
-      kwh_chart.data.labels = created_at.slice(-12);
-      kwh_chart.data.datasets[0].data = totalKwh;
-
-      kwh_chart.update();
-    })
-    .catch(error => {
-      console.error('Error fetching data from server:', error);
-    });
-}
-
 // Fungsi untuk mengambil data dari server
 function fetchDataKwhPerDevice() {
   fetch('/analyze/get/kwhmonth')
@@ -297,11 +217,218 @@ function fetchDataKwhPerDevice() {
     });
 }
 
-
-fetchChartKwhCost();
 fetchDataPowerChart();
 fetchDataKwhPerDevice();
 
-// Perbarui data setiap detik menggunakan setInterval
-// setInterval(fetchChartKwhCost, 2000);
 setInterval(fetchDataPowerChart, 2000);
+
+
+$.ajax({
+  url: '/analyze/get/forecast', // Ubah URL sesuai dengan rute yang ditentukan pada controller
+  method: 'GET',
+  success: function(response) {
+      var monthlyData = response;
+
+      // Membuat array untuk menyimpan bulan dan biaya listrik aktual dan prediksi
+      var labels = [];
+      var actualData = [];
+      var predictedData = [];
+
+      // Mengisi array dengan data dari 'monthlyData'
+      for (var i = 0; i < monthlyData.length; i++) {
+          labels.push("Bulan " + monthlyData[i].month);
+          actualData.push(monthlyData[i].actual);
+          predictedData.push(monthlyData[i].predicted);
+      }
+
+      // Mengatur konfigurasi bar chart
+      var config = {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [
+                  {
+                    label: "Biaya Listrik Aktual",
+                    weight: 5,
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    backgroundColor: '#5e72e4',
+                    fill: true,
+                    data: actualData,
+                    maxBarThickness: 35
+                  },
+                  {
+                    label: "Prediksi Biaya Listrik",
+                    weight: 5,
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    backgroundColor: '#3A416F',
+                    fill: true,
+                    data: predictedData,
+                    maxBarThickness: 35
+                  }
+              ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            // plugins: {
+            //   legend: {
+            //     display: false
+            //   }
+            // },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            },
+            scales: {
+              y: {
+                grid: {
+                  drawBorder: false,
+                  display: true,
+                  drawOnChartArea: true,
+                  drawTicks: false,
+                  borderDash: [5, 5]
+                },
+                ticks: {
+                  display: true,
+                  padding: 10,
+                  color: '#9ca2b7'
+                },
+              },
+              x: {
+                grid: {
+                  drawBorder: false,
+                  display: false,
+                  drawOnChartArea: true,
+                  drawTicks: true,
+                },
+                ticks: {
+                  display: true,
+                  color: '#9ca2b7',
+                  padding: 10
+                },
+              },
+            },
+          },
+      };
+
+      // // Mengatur konfigurasi chart
+      // var config = {
+      //     type: 'line',
+      //     data: {
+      //         labels: labels,
+      //         datasets: [
+      //             {
+      //               label: "Biaya Listrik Aktual",
+      //               tension: 0.4,
+      //               borderWidth: 0,
+      //               pointRadius: 0,
+      //               borderColor: "#5e72e4",
+      //               borderWidth: 3,
+      //               backgroundColor: gradientStroke1,
+      //               fill: true,
+      //               data: actualData,
+      //               maxBarThickness: 6
+      //             },
+      //             {
+      //               label: "Prediksi Biaya Listrik",
+      //               tension: 0.4,
+      //               borderWidth: 0,
+      //               pointRadius: 0,
+      //               borderColor: "#3A416F",
+      //               borderWidth: 3,
+      //               backgroundColor: gradientStroke2,
+      //               fill: true,
+      //               data: predictedData,
+      //               maxBarThickness: 6,
+
+      //                 // borderDash: [5, 5]
+      //             }
+      //         ]
+      //     },
+      //     options: {
+      //       // title: {
+      //       //   display: true,
+      //       //   text: 'Grafik Biaya Listrik Aktual dan Prediksi'
+      //       //  },
+      //       responsive: true,
+      //       maintainAspectRatio: false,
+      //       plugins: {
+      //         legend: {
+      //           display: false,
+      //         }
+      //       },
+      //       interaction: {
+      //         intersect: false,
+      //         mode: 'index',
+      //       },
+      //         scales: {
+      //           y: {
+      //             grid: {
+      //               drawBorder: false,
+      //               display: true,
+      //               drawOnChartArea: true,
+      //               drawTicks: false,
+      //               borderDash: [5, 5]
+      //             },
+      //             ticks: {
+      //               display: true,
+      //               padding: 10,
+      //               color: '#b2b9bf',
+      //               font: {
+      //                 size: 11,
+      //                 family: "Open Sans",
+      //                 style: 'normal',
+      //                 lineHeight: 2
+      //               },
+      //             }
+      //           },
+      //           x: {
+      //             grid: {
+      //               drawBorder: false,
+      //               display: false,
+      //               drawOnChartArea: false,
+      //               drawTicks: false,
+      //               borderDash: [5, 5]
+      //             },
+      //             ticks: {
+      //               display: true,
+      //               color: '#b2b9bf',
+      //               padding: 10,
+      //               font: {
+      //                 size: 11,
+      //                 family: "Open Sans",
+      //                 style: 'normal',
+      //                 lineHeight: 2
+      //               },
+      //             }
+      //           },
+      //         },
+      //     },
+      // };
+
+      // Membuat chart dengan menggunakan konfigurasi yang telah ditentukan
+      
+      var ctx3 = document.getElementById("line-chart-gradient").getContext("2d");
+      // var ctx = document.getElementById('chart').getContext('2d');
+
+      var gradientStroke1 = ctx3.createLinearGradient(0, 230, 0, 50);
+
+      gradientStroke1.addColorStop(1, 'rgba(94,114,228,0.2)');
+      gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+      gradientStroke1.addColorStop(0, 'rgba(94,114,228,0)'); //purple colors
+
+      var gradientStroke2 = ctx3.createLinearGradient(0, 230, 0, 50);
+
+      gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
+      gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+      gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
+
+
+      new Chart(ctx3, config);
+  },
+  error: function(xhr, status, error) {
+      console.error(error); // Menampilkan pesan error jika terjadi kesalahan pada permintaan AJAX
+  }
+});
