@@ -29,8 +29,8 @@ use App\Models\ManageStatusModel;
 
 Route::get('manage-device/show-mac', [ManageDeviceController::class, 'getData']);
 
-Route::get('add-device', [AddDeviceController::class, 'index']);
-Route::get('show-mac', [AddDeviceController::class, 'getData']);
+Route::get('add-device', [ManageStatusModel::class, 'index']);
+Route::get('show-mac', [ManageStatusModel::class, 'getData']);
 
 
 Route::get('manage-status/{device_id}', [ManageStatusController::class, 'tampil'])->name('manage-status.tampil');
@@ -55,6 +55,7 @@ Route::resource('/', DashboardController::class);
 Route::resource('room', RoomController::class);
 Route::resource('alldevice', AllDeviceController::class);
 Route::resource('manage-device', ManageDeviceController::class);
+Route::delete('/manage-device/{device_id}', [DeviceController::class, 'deleteDevice'])->name('manage-device.delete');
 
 // Route::resource('alldevice/create', [ManageRelayController::class, 'create']);
 

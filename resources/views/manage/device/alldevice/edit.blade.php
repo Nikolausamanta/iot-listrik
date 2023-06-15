@@ -5,7 +5,7 @@
     <div class="row mt-3">
         <div class="col-md-4">
             <div class="top-title">
-                <h2 class="">Add Device</h2>
+                <h2 class="">Edit Device</h2>
                 <p>Have a nice day</p>
             </div>
         </div>
@@ -30,19 +30,20 @@
             </pt-3>
             @endif
             <div class="d-flex align-items-center">
-                <p class="mb-0">Add Device</p>
+                <p class="mb-0">Edit Device</p>
             </div>
         </div>
         <div class="card-body col-lg-12">
             <div class="row mt-4">
                 <div class="col-lg-7">
-                    <form action='{{url('manage-device')}}' method='post' role="form text-left">
+                    <form action='{{url('manage-device/'. $edit_device->device_id)}}' method='post' role="form text-left">
                         @csrf
+                        @method('PUT')
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="example-text-input" class="form-control-label">Device Name</label>
-                                    <input type="text" class="form-control" name="device_name" value="{{ Session::get('device_name')}}" placeholder="Device Name" aria-label="Name" aria-describedby="name-addon">
+                                    <input type="text" class="form-control" name="device_name" value="{{$edit_device->device_name}}" placeholder="Device Name" aria-label="Name" aria-describedby="name-addon">
                                 </div>
                             </div>
                         </div>
@@ -53,7 +54,7 @@
                                     <div class="row">
                                         <label for="example-text-input" class="form-control-label">Mac Address</label>
                                     </div>
-                                    <input id="macAddressInput" type="text" class="form-control" name="mac_address" value="{{ Session::get('mac_address')}}" placeholder="Mac Address">
+                                    <input id="macAddressInput" type="text" class="form-control" name="mac_address" value="{{$edit_device->mac_address}}" placeholder="Mac Address" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">

@@ -26,6 +26,7 @@ class ManageDeviceController extends Controller
         //     'title' => 'Manage Device'
         // ]);
     }
+
     public function getData()
     {
         $macAddresses = MacAddressModel::orderBy('id', 'desc')->first();
@@ -70,11 +71,10 @@ class ManageDeviceController extends Controller
                 'required',
                 function ($attribute, $value, $fail) {
                     $existingData = ManageDeviceModel::where('mac_address', $value)
-                        ->where('user_id', Auth::id())
                         ->first();
 
                     if ($existingData) {
-                        $fail('Data 1 has already been added by the current user.');
+                        $fail('The mac address has already been added.');
                     }
                 },
             ],
@@ -117,6 +117,9 @@ class ManageDeviceController extends Controller
     }
 
 
+
+
+
     /**
      * Display the specified resource.
      *
@@ -136,8 +139,15 @@ class ManageDeviceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $session_device_id = session('device_id');
+
+        $data = ManageDeviceModel::where('device_id', $id)->first();
+
+        return view('manage.device.alldevice.edit', [
+            'title' => 'Manage Device'
+        ])->with('edit_device', $data);
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -148,7 +158,23 @@ class ManageDeviceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'device_name' => 'required',
+            'mac_address' => 'required',
+        ], [
+            'device_name.required' => 'diisi woy',
+            'mac_address.required' => 'diisi woy',
+        ]);
+
+        $device_name = $request->input('device_name');
+        $mac_address = $request->input('mac_address');
+        ManageDeviceModel::where('device_id', $id)->update([
+            'device_name' => $device_name,
+            'mac_address' => $mac_address,
+        ]);
+
+        // $session_device_id = session('device_id');
+        return redirect()->to('alldevice')->with('success', 'Berhasil melakukan update data');
     }
 
     /**
@@ -159,6 +185,14 @@ class ManageDeviceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $session_device_id = session('device_id');
+
+        // Menghapus relasi RelayModel terkait
+        ManageDeviceModel::find($id)->relays()->delete();
+
+        // Menghapus data dari ManageDeviceModel
+        ManageDeviceModel::where('device_id', $id)->delete();
+
+        return redirect()->to('alldevice')->with('success', 'Berhasil melakukan delete data');
     }
 }

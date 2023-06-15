@@ -27,4 +27,9 @@ class ManageDeviceModel extends Model
     {
         return $this->hasOne(ManageStatusModel::class, 'device_id');
     }
+
+    public function relays()
+    {
+        return $this->hasMany(ManageRelayModel::class, 'device_id');
+    }
 }

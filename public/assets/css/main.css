@@ -1,7 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&display=swap');
 
-
-
 /*? Start Title */
 .top-title h2{
   margin-bottom: -8px;
@@ -130,8 +128,10 @@ hr.line {
   .col-lg-1 .kanan {
     float: right; 
   }
-  /*? Endt tombol kanan  */
 }
+/*? Endt tombol kanan  */
+
+
 
 /*? Start Card Device */
 
@@ -244,8 +244,57 @@ hr.line {
 .container .card2 button {
   background-color: #2b26c3;
 }
-
 /*? End Card Device*/
+
+/*? Start Dropdown Card Device */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.circle {
+  width: 8px;
+  height: 8px;
+  margin: 3px;
+  background: #da4d1d;
+  border-radius: 50%;
+  display: block;
+}
+
+.dots {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 8px;
+  z-index: 1;
+  border-radius: 12px;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-item {
+  color: #000;
+  text-decoration: none;
+  display: block;
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+
+.dropdown-item:hover {
+  background-color: #ddd;
+}
+/*? End Dropdown Card Device */
+
+
 
 /*? Start Toggle Switch (On/Off) */
     .power-switch {

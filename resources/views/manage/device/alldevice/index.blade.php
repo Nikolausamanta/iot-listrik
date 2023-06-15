@@ -39,11 +39,35 @@
                 <div class="card-device">
                     <h2>{{ $row->device_name }}</h2>
                     <p>{{ $row->mac_address }}</p>
-                    <div class="pic"></div>
+                    <div class="pic">
+                        {{-- <a href="{{url('manage-status/'.$row->device_id.'/edit')}}">
+                            <i class="btn btn-primary">aa</i>
+                        </a> --}}
+
+                        <div class="dropdown">
+                            <div class="dots">
+                                <div class="circle"></div>
+                                <div class="circle"></div>
+                                <div class="circle"></div>
+                            </div>
+                            <div class="dropdown-content">
+                              <a class="dropdown-item" href="{{url('manage-device/'.$row->device_id.'/edit')}}">
+                                {{-- <i class="fa-solid fa-pen"></i> --}}
+                                Edit
+                              </a>
+                              <form onsubmit="return confirm('Apakah Anda yakin ingin menghapus?')" class="d-inline" action="{{ route('manage-device.delete', ['device_id' => $row->device_id]) }}" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <a href="#" onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item">del</a>
+                              </form>
+                            </div>
+                          </div>
+                    </div>
                     <a href="{{url('manage-status/'.$row->device_id)}}">
                         <button></button>
                     </a>
                 </div>
+                
             </div>
         </div>
         @endforeach
