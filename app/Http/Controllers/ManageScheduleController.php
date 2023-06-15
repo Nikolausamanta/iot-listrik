@@ -136,25 +136,31 @@ class ManageScheduleController extends Controller
      */
     public function edit($id)
     {
-        // return 'hi' . $id;
-        $data = ManageScheduleModel::orderBy('updated_at', 'desc')->paginate(10);
+        $session_device_id = session('device_id');
+        $device_name = ManageDeviceModel::where('device_id', $session_device_id)->value('device_name');
+
+        $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('updated_at', 'desc')->paginate(6);
         $data1 = ManageScheduleModel::where('schedule_id', $id)->first();
-        $data2 = ManageScheduleModel::orderBy('updated_at', 'desc')->limit(1)->get();
+        $data2 = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('waktu1', 'asc')->limit(1)->get();
+
+        // Konversi waktu1 menjadi tanggal dan waktu terpisah
+        $datewaktu1 = Carbon::createFromTimestamp($data1->waktu1)->setTimezone('Asia/Singapore');
+        $tanggal1 = $datewaktu1->format('Y-m-d');
+        $waktu1 = $datewaktu1->format('H:i:s');
+
+        $datewaktu2 = Carbon::createFromTimestamp($data1->waktu1)->setTimezone('Asia/Singapore');
+        $waktu2 = $datewaktu2->format('H:i:s');
         return view('manage.schedule.4-channel.index-schedule', [
             'title' => 'Manage Device'
         ])
             ->with('data_manage_schedule', $data)
             ->with('edit_schedule', $data1)
-            ->with('upcoming', $data2);
-
-        // return view('manage.schedule.4-channel.edit')->with('edit_schedule', $data1);
-
-
-
-        // $data2 = ManageScheduleModel::orderBy('updated_at', 'desc')->paginate(5);
-        // return view('manage.schedule.4-channel.edit', [
-        //     'title' => 'Manage Schedule'
-        // ])->with('edit_schedule', $data)->with('data_manage_schedule', $data2);
+            ->with('upcoming', $data2)
+            ->with('device_name', $device_name)
+            ->with('device_id', $session_device_id)
+            ->with('tanggal1', $tanggal1)
+            ->with('waktu1', $waktu1)
+            ->with('waktu2', $waktu2);
     }
 
     /**
@@ -178,15 +184,28 @@ class ManageScheduleController extends Controller
             'tanggal.required1' => 'diisi woy',
         ]);
 
-        $data = [
-            'nama_schedule' => $request->nama_schedule,
-            'waktu1' => $request->waktu1,
-            'waktu2' => $request->waktu2,
-            'tanggal1' => $request->tanggal1,
-        ];
+        $nama_schedule = $request->input('nama_schedule');
+        $tanggal1 = $request->input('tanggal1');
+        $waktu1 = $request->input('waktu1');
+        $waktu2 = $request->input('waktu2');
 
-        ManageScheduleModel::where('schedule_id', $id)->update($data);
-        return redirect()->to('manage-schedule')->with('success', 'Berhasil melakukan update data');
+        $gabung1 = $tanggal1 . ' ' . $waktu1;
+        $gabung2 = $tanggal1 . ' ' . $waktu2;
+        $dateTime1 = Carbon::createFromFormat('Y-m-d H:i:s', $gabung1, 'Asia/Singapore');
+        $dateTime2 = Carbon::createFromFormat('Y-m-d H:i:s', $gabung2, 'Asia/Singapore');
+        $dateTime1->setTimezone('UTC');
+        $dateTime2->setTimezone('UTC');
+        $waktuEpoch1 = $dateTime1->timestamp;
+        $waktuEpoch2 = $dateTime2->timestamp;
+
+        ManageScheduleModel::where('schedule_id', $id)->update([
+            'nama_schedule' => $nama_schedule,
+            'waktu1' => $waktuEpoch1,
+            'waktu2' => $waktuEpoch2,
+        ]);
+
+        $session_device_id = session('device_id');
+        return redirect()->to('manage-schedule/' . $session_device_id)->with('success', 'Berhasil melakukan update data');
     }
 
     /**
@@ -197,8 +216,10 @@ class ManageScheduleController extends Controller
      */
     public function destroy($id)
     {
+        $session_device_id = session('device_id');
+
         ManageScheduleModel::where('schedule_id', $id)->delete();
-        return redirect()->to('manage-schedule')->with('success', 'Berhasil melakukan delete data');
+        return redirect()->to('manage-schedule/' . $session_device_id)->with('success', 'Berhasil melakukan delete data');
     }
 
     public function jam()

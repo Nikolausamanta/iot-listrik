@@ -42,14 +42,14 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Time</label>
-                    <input step="1" type="time" class="form-control" name="waktu1" value="{{$edit_schedule->waktu1}}" placeholder="Time">
+                    <input step="1" type="time" class="form-control" name="waktu1" value="{{$waktu1}}" placeholder="Time">
                     {{-- <input class="form-control" type="text" onfocus="focused(this)" onfocusout="defocused(this)"> --}}
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Time 2</label>
-                    <input step="1" type="time" class="form-control" name="waktu2" value="{{$edit_schedule->waktu2}}" placeholder="Time">
+                    <input step="1" type="time" class="form-control" name="waktu2" value="{{$waktu2}}" placeholder="Time">
                     {{-- <input class="form-control" type="text" onfocus="focused(this)" onfocusout="defocused(this)"> --}}
                   </div>
                 </div>
@@ -62,7 +62,7 @@
                 <div class="col-md-12">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Date</label>
-                    <input type="date" class="form-control" name="tanggal1" value="{{$edit_schedule->tanggal1}}" placeholder="Date">
+                    <input type="date" class="form-control" name="tanggal1" value="{{$tanggal1}}" placeholder="Date">
                     {{-- <input class="form-control" type="text" onfocus="focused(this)" onfocusout="defocused(this)"> --}}
                   </div>
                 </div>
@@ -75,7 +75,7 @@
                   </div>
                   <div class="col-lg-6">
                   <div class="text-center">
-                    <a href="/manage-schedule" class="btn btn-danger btn-lg btn-rounded px-5 mt-4 mb-0">Cancel</a>
+                    <a href="{{url('manage-schedule/'.$device_id)}}" class="btn btn-danger btn-lg btn-rounded px-5 mt-4 mb-0">Cancel</a>
                 </div>
                 </div>
               </div>
