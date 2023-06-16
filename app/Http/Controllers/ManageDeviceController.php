@@ -187,8 +187,14 @@ class ManageDeviceController extends Controller
     {
         $session_device_id = session('device_id');
 
-        // Menghapus relasi RelayModel terkait
+        // Menghapus relasi ManageRelayModel terkait
         ManageDeviceModel::find($id)->relays()->delete();
+
+        // Menghapus relasi TimerModel terkait
+        ManageDeviceModel::find($id)->timers()->delete();
+
+        // Menghapus relasi ManageScheduleModel terkait
+        ManageDeviceModel::find($id)->schedules()->delete();
 
         // Menghapus data dari ManageDeviceModel
         ManageDeviceModel::where('device_id', $id)->delete();

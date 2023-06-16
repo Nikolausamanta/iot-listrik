@@ -32,4 +32,14 @@ class ManageDeviceModel extends Model
     {
         return $this->hasMany(ManageRelayModel::class, 'device_id');
     }
+
+    public function timers()
+    {
+        return $this->hasMany(TimerModel::class, 'device_id');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(ManageScheduleModel::class, 'device_id');
+    }
 }
