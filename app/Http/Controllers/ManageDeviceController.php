@@ -185,7 +185,13 @@ class ManageDeviceController extends Controller
      */
     public function destroy($id)
     {
-        $session_device_id = session('device_id');
+        // Menghapus ManageStatusModel terkait
+        $device = ManageDeviceModel::where('device_id', $id)->first();
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            ManageStatusModel::where('mac_address', $mac_address)->delete();
+        }
 
         // Menghapus relasi ManageRelayModel terkait
         ManageDeviceModel::find($id)->relays()->delete();
