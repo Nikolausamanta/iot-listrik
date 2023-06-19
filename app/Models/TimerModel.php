@@ -13,9 +13,9 @@ class TimerModel extends Model
 
     protected $table = 'tb_timer';
     protected $primaryKey = 'timer_id';
-    protected $fillable = ['relay_id', 'device_id', 'duration', 'end_time'];
+    protected $fillable = ['relay_id', 'device_id', 'duration', 'end_time', 'status'];
 
-    public static function createOrUpdate($deviceId, $duration)
+    public static function createOrUpdate($deviceId, $duration, $status)
     {
         $timer = TimerModel::where('device_id', $deviceId)->first();
 
@@ -23,12 +23,14 @@ class TimerModel extends Model
             $timer->update([
                 'duration' => $duration,
                 'end_time' => Carbon::now()->addSeconds($duration),
+                'status' => $status,
             ]);
         } else {
             TimerModel::create([
                 'device_id' => $deviceId,
                 'duration' => $duration,
                 'end_time' => Carbon::now()->addSeconds($duration),
+                'status' => $status,
             ]);
         }
     }

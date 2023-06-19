@@ -3,7 +3,7 @@
 @section('content')
   
 {{--? Start Card Content  --}}
-<div class="container-fluid py-4">
+<div class="container-fluid">
     @if (Session::has('success'))
         <div class="pt-3">
           <div class="alert alert-success">

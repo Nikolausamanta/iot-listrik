@@ -2,7 +2,7 @@
 
 @section('content')
   
-<div class="container-fluid py-4">
+<div class="container-fluid">
     
     {{--? Start Card Content 1 Column  --}}
     {{--? Start Judul Atas  --}}
@@ -17,14 +17,14 @@
             {{-- <h5>{{$totalkwh}}</h5> --}}
         <h6 id="totalCost"></h6>
 
-        @foreach ($data as $row)
+        {{-- @foreach ($data as $row)
             <a href="{{url('analyze/'.$row->device_id)}}" class="kanan btn btn-outline-primary me-2 mt-3 ">
                 {{ $row->device_name }}
             </a>
         @endforeach
         <a href="analyze/" class="kanan btn btn-outline-primary me-2 mt-3 ">
             All Device
-        </a>
+        </a> --}}
         </div>
     </div>
     {{--? End Judul Atas  --}}
@@ -175,7 +175,6 @@
                     </div>
                 </div>
             </div> --}}
-             
         </div>
     </div>
     {{--? End Sensor  --}}

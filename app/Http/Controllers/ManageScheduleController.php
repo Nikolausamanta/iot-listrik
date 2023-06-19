@@ -9,33 +9,38 @@ use App\Models\ManageRelayModel;
 use App\Models\ManageDeviceModel;
 use App\Models\ManageStatusModel;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\ManageScheduleModel;
 use Illuminate\Support\Facades\Session;
 
 class ManageScheduleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // public function index()
-    // {
-    //     $data1 = ManageScheduleModel::orderBy('waktu1', 'asc')->limit(1)->get();
-    //     // dd($data1);
-    //     $data = ManageScheduleModel::orderBy('updated_at', 'desc')->paginate(6);
-    //     return view('manage.schedule.4-channel.index-schedule', [
-    //         'title' => 'Manage Device'
-    //     ])->with('data_manage_schedule', $data)->with('upcoming', $data1);
-    // }
 
     public function tampil(Request $request)
     {
         $device_id = $request->route('device_id');
         $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
 
-        $data1 = ManageScheduleModel::where('device_id', $device_id)->orderBy('updated_at', 'desc')->paginate(6);
-        $data2 = ManageScheduleModel::where('device_id', $device_id)->orderBy('waktu1', 'asc')->limit(1)->get();
+        $schedules = ManageScheduleModel::select('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
+            ->groupBy('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
+            ->get();
+
+        $groupedSchedules = [];
+
+        foreach ($schedules as $schedule) {
+            $formattedTime = $this->getFormattedTime($schedule->time);
+            $groupedSchedules[$schedule->schedule_group][] = [
+                'nama_schedule' => $schedule->nama_schedule,
+                'time' => $formattedTime,
+                'status' => $schedule->status,
+                'schedule_condition' => $schedule->schedule_condition,
+            ];
+        }
+
+
+
+        // $data1 = ManageScheduleModel::where('device_id', $device_id)->orderBy('time', 'desc')->paginate(6);
+        $data2 = ManageScheduleModel::where('device_id', $device_id)->orderBy('time', 'asc')->limit(1)->get();
 
         session(['device_id' => $device_id]);
 
@@ -43,8 +48,23 @@ class ManageScheduleController extends Controller
         // return $data2;
         return view('manage.schedule.4-channel.index-schedule', [
             'title' => 'Status'
-        ])->with('data_manage_schedule', $data1)->with('upcoming', $data2)->with('device_id', $device_id)->with('device_name', $device_name);
+        ])->with('groupedSchedules', $groupedSchedules)
+            // ->with('data_manage_schedule', $data1)
+            ->with('upcoming', $data2)
+            ->with('device_id', $device_id)
+            ->with('device_name', $device_name);
     }
+
+    public function getFormattedTime($time)
+    {
+        $carbonTime = Carbon::createFromTimestamp($time);
+        $formattedTime = $carbonTime->format('D H:i:s');
+        $formattedTime = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], $formattedTime);
+        return $formattedTime;
+    }
+
+
+
 
 
     /**
@@ -63,59 +83,103 @@ class ManageScheduleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
-
-        Session::flash('nama_schedule', $request->nama_schedule);
-        Session::flash('waktu1', $request->waktu1);
-        Session::flash('waktu2', $request->waktu2);
-        Session::flash('tanggal1', $request->tanggal1);
-
+        // Validasi Input
         $request->validate([
             'nama_schedule' => 'required',
-            'waktu1' => 'required',
-            'waktu2' => 'required',
-            'tanggal1' => 'required',
+            'time' => 'required',
         ], [
-            'nama_schedule.required' => 'diisi woy',
-            'waktu1.required' => 'diisi woy',
-            'waktu2.required' => 'diisi woy',
-            'tanggal1.required' => 'diisi woy',
+            'nama_schedule.required' => 'The schedule name field is required.',
+            'time.required' => 'The time field is required.',
         ]);
 
-        // $data = [
-        //     'nama_schedule' => $request->nama_schedule,
-        //     'waktu1' => $request->waktu1,
-        //     'waktu2' => $request->waktu2,
-        //     'tanggal1' => $request->tanggal1,
-        // ];
-
-        // ManageScheduleModel::create($data);
+        // Mendapatkan ID Perangkat dari Session
         $device_id_session = session('device_id');
 
+        // Mendapatkan Nilai Input dari Request
         $nama_schedule = $request->input('nama_schedule');
-        $tanggal1 = $request->input('tanggal1');
-        $waktu1 = $request->input('waktu1');
-        $waktu2 = $request->input('waktu2');
+        $time = $request->input('time');
+        $status = $request->input('status');
+        $option = $request->input('option');
+        $hari = [];
 
-        $gabung1 = $tanggal1 . ' ' . $waktu1;
-        $gabung2 = $tanggal1 . ' ' . $waktu2;
-        $dateTime1 = Carbon::createFromFormat('Y-m-d H:i:s', $gabung1, 'Asia/Singapore');
-        $dateTime2 = Carbon::createFromFormat('Y-m-d H:i:s', $gabung2, 'Asia/Singapore');
-        $dateTime1->setTimezone('UTC');
-        $dateTime2->setTimezone('UTC');
-        $waktuEpoch1 = $dateTime1->timestamp;
-        $waktuEpoch2 = $dateTime2->timestamp;
+        $largestScheduleGroup = ManageScheduleModel::max('schedule_group');
+        $schedule_group = $largestScheduleGroup + 1;
 
-        ManageScheduleModel::create([
-            'device_id' => $device_id_session,
-            'nama_schedule' => $nama_schedule,
-            'waktu1' => $waktuEpoch1,
-            'waktu2' => $waktuEpoch2,
-        ]);
+        // Pengolahan Pilihan Hari
+        if ($option === 'once') {
+            // Jika pilihan adalah "once", tambahkan "hari_ini" ke array hari
+            $hari[] = 'hari_ini';
+            $schedule_condition = 'once';
+        } elseif ($option === 'repeat') {
+            // Jika pilihan adalah "repeat", ambil nilai array dari inputan "hari"
+            $hari = $request->input('hari');
+            // Periksa apakah checkbox "repeat_weekly" dicentang, jika iya, set kondisi jadwal menjadi "repeat", jika tidak, set kondisi jadwal menjadi "once"
+            $schedule_condition = $request->has('repeat_weekly') ? 'repeat' : 'once';
+        }
 
-        return redirect()->to('manage-schedule/' . $device_id_session)->with('success', 'berhasil menambahkan data uy');
+        // Perulangan dan Penyimpanan Data
+        foreach ($hari as $selectedHari) {
+            // Mendapatkan tanggal berdasarkan pilihan hari
+            $currentDate = Carbon::now();
+            $tanggal = $this->getTanggalByHari($selectedHari, $currentDate);
+
+            // Konversi tanggal dan waktu ke epoch time
+            $epochTime = $this->convertToEpoch($tanggal, $time);
+
+            // Membuat instance dari model dan menyimpan data
+            $schedule = new ManageScheduleModel();
+            $schedule->device_id = $device_id_session;
+            $schedule->nama_schedule = $nama_schedule;
+            $schedule->time = $epochTime;
+            $schedule->status = $status;
+            $schedule->schedule_condition = $schedule_condition;
+            $schedule->schedule_group = $schedule_group;
+            $schedule->save();
+        }
+
+        // Redirect ke halaman manage-schedule dengan ID perangkat dan memberikan pesan sukses
+        return redirect()->to('manage-schedule/' . $device_id_session)->with('success', 'Successfully added the schedule!');
     }
+
+    private function getTanggalByHari($hari, $currentDate)
+    {
+        // Jika pilihan hari adalah "hari_ini", kembalikan tanggal hari ini
+        if ($hari === 'hari_ini') {
+            return $currentDate->format('Y-m-d');
+        }
+
+        // Jika pilihan hari adalah hari selain "hari_ini", cari tanggal berikutnya berdasarkan nama hari
+        $selectedDay = Carbon::parse($hari)->isoFormat('dddd');
+        $nextDate = $this->getNextAvailableDate($selectedDay, $currentDate);
+        $tanggal = $nextDate->format('Y-m-d');
+
+        return $tanggal;
+    }
+
+    private function getNextAvailableDate($selectedDay, $currentDate)
+    {
+        // Mendapatkan tanggal berikutnya berdasarkan nama hari
+        $nextDate = $currentDate->copy();
+
+        while ($nextDate->isoFormat('dddd') !== $selectedDay) {
+            $nextDate = $nextDate->addDay();
+        }
+
+        return $nextDate;
+    }
+
+    private function convertToEpoch($tanggal, $time)
+    {
+        $dateTime = $tanggal . ' ' . $time;
+        $epochTime = Carbon::parse($dateTime)->timestamp;
+
+        return $epochTime;
+    }
+
+
 
     /**
      * Display the specified resource.
@@ -136,32 +200,54 @@ class ManageScheduleController extends Controller
      */
     public function edit($id)
     {
+        $schedules = ManageScheduleModel::select('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
+            ->groupBy('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
+            ->get();
+
+        $groupedSchedules = [];
+
+        foreach ($schedules as $schedule) {
+            $formattedTime = $this->getFormattedTime($schedule->time);
+            $groupedSchedules[$schedule->schedule_group][] = [
+                'nama_schedule' => $schedule->nama_schedule,
+                'time' => $formattedTime,
+                'status' => $schedule->status,
+                'schedule_condition' => $schedule->schedule_condition,
+            ];
+        }
+
         $session_device_id = session('device_id');
         $device_name = ManageDeviceModel::where('device_id', $session_device_id)->value('device_name');
 
-        $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('updated_at', 'desc')->paginate(6);
-        $data1 = ManageScheduleModel::where('schedule_id', $id)->first();
-        $data2 = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('waktu1', 'asc')->limit(1)->get();
+        $data1 = ManageScheduleModel::where('schedule_group', $id)->first();
+        $data3 = ManageScheduleModel::where('schedule_group', $id)->get();
+        $data2 = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('time', 'asc')->limit(1)->get();
 
-        // Konversi waktu1 menjadi tanggal dan waktu terpisah
-        $datewaktu1 = Carbon::createFromTimestamp($data1->waktu1)->setTimezone('Asia/Singapore');
-        $tanggal1 = $datewaktu1->format('Y-m-d');
-        $waktu1 = $datewaktu1->format('H:i:s');
+        $datetimeArray = [];
+        foreach ($data3 as $schedule) {
+            $datewaktu = Carbon::createFromTimestamp($schedule->time)->setTimezone('Asia/Singapore');
+            $tanggal = $datewaktu->format('Y-m-d');
+            $time = $datewaktu->format('H:i:s');
 
-        $datewaktu2 = Carbon::createFromTimestamp($data1->waktu1)->setTimezone('Asia/Singapore');
-        $waktu2 = $datewaktu2->format('H:i:s');
+            $datetimeArray[] = [
+                'tanggal' => $tanggal,
+            ];
+        }
+
+        // return $datetimeArray;
         return view('manage.schedule.4-channel.index-schedule', [
-            'title' => 'Manage Device'
+            'title' => 'Manage Device',
         ])
-            ->with('data_manage_schedule', $data)
             ->with('edit_schedule', $data1)
             ->with('upcoming', $data2)
+            ->with('groupedSchedules', $groupedSchedules)
             ->with('device_name', $device_name)
             ->with('device_id', $session_device_id)
-            ->with('tanggal1', $tanggal1)
-            ->with('waktu1', $waktu1)
-            ->with('waktu2', $waktu2);
+            ->with('datetimeArray', $datetimeArray)
+            ->with('time', $time);
     }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -174,39 +260,54 @@ class ManageScheduleController extends Controller
     {
         $request->validate([
             'nama_schedule' => 'required',
-            'waktu1' => 'required',
-            'waktu2' => 'required',
-            'tanggal1' => 'required',
+            'time' => 'required',
         ], [
-            'nama_schedule.required' => 'diisi woy',
-            'waktu.required1' => 'diisi woy',
-            'waktu.required2' => 'diisi woy',
-            'tanggal.required1' => 'diisi woy',
+            'nama_schedule.required' => 'The schedule name field is required.',
+            'time.required' => 'The time field is required.',
         ]);
 
-        $nama_schedule = $request->input('nama_schedule');
-        $tanggal1 = $request->input('tanggal1');
-        $waktu1 = $request->input('waktu1');
-        $waktu2 = $request->input('waktu2');
+        $schedule = ManageScheduleModel::findOrFail($id);
 
-        $gabung1 = $tanggal1 . ' ' . $waktu1;
-        $gabung2 = $tanggal1 . ' ' . $waktu2;
-        $dateTime1 = Carbon::createFromFormat('Y-m-d H:i:s', $gabung1, 'Asia/Singapore');
-        $dateTime2 = Carbon::createFromFormat('Y-m-d H:i:s', $gabung2, 'Asia/Singapore');
-        $dateTime1->setTimezone('UTC');
-        $dateTime2->setTimezone('UTC');
-        $waktuEpoch1 = $dateTime1->timestamp;
-        $waktuEpoch2 = $dateTime2->timestamp;
+        $schedule->nama_schedule = $request->input('nama_schedule');
+        $schedule->time = $this->convertToEpoch($schedule->tanggal, $request->input('time'));
+        $schedule->status = $request->input('status');
+        $option = $request->input('option');
+        $hari = [];
 
-        ManageScheduleModel::where('schedule_id', $id)->update([
-            'nama_schedule' => $nama_schedule,
-            'waktu1' => $waktuEpoch1,
-            'waktu2' => $waktuEpoch2,
-        ]);
+        if ($option === 'once') {
+            $hari[] = 'hari_ini';
+            $schedule->schedule_condition = 'once';
+        } elseif ($option === 'repeat') {
+            $hari = $request->input('hari');
+            $schedule->schedule_condition = $request->has('repeat_weekly') ? 'repeat' : 'once';
+        }
 
-        $session_device_id = session('device_id');
-        return redirect()->to('manage-schedule/' . $session_device_id)->with('success', 'Berhasil melakukan update data');
+        // Hapus jadwal sebelumnya jika ada
+        $schedule->schedules()->delete();
+
+        foreach ($hari as $selectedHari) {
+            $currentDate = Carbon::now();
+            $tanggal = $this->getTanggalByHari($selectedHari, $currentDate);
+            $epochTime = $this->convertToEpoch($tanggal, $request->input('time'));
+
+            $newSchedule = new ManageScheduleModel();
+            $newSchedule->device_id = $schedule->device_id;
+            $newSchedule->nama_schedule = $schedule->nama_schedule;
+            $newSchedule->time = $epochTime;
+            $newSchedule->status = $schedule->status;
+            $newSchedule->schedule_condition = $schedule->schedule_condition;
+
+            $schedule->schedules()->save($newSchedule);
+        }
+
+
+        $schedule->save();
+
+        return redirect()->to('manage-schedule/' . $schedule->device_id)->with('success', 'Schedule updated successfully!');
     }
+
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -214,27 +315,25 @@ class ManageScheduleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($scheduleGroup)
     {
-        $session_device_id = session('device_id');
+        ManageScheduleModel::where('schedule_group', $scheduleGroup)->delete();
 
-        ManageScheduleModel::where('schedule_id', $id)->delete();
-        return redirect()->to('manage-schedule/' . $session_device_id)->with('success', 'Berhasil melakukan delete data');
+        return redirect()->back()->with('success', 'Schedule has been successfully deleted!');
     }
+
 
     public function jam()
     {
         date_default_timezone_set('Asia/Singapore');
         $time = date('H:i:s', time());
         echo $time;
-        // $epoch = time();
-        // echo $epoch;
     }
 
     public function ubahstatus(Request $request)
     {
         date_default_timezone_set('Asia/Singapore');
-        $time = time();
+        $local_time = time();
 
         $session_device_id = session('device_id');
         $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
@@ -248,22 +347,29 @@ class ManageScheduleController extends Controller
 
             if ($relay) {
                 $device_id_relay = $relay->device_id;
-                $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
 
                 $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('schedule_id', 'asc')->get();
 
                 foreach ($data as $schedule) {
-                    $id = $schedule->schedule_id;
+                    $schedule_id = $schedule->schedule_id;
                     $device_id = $schedule->device_id;
-                    $jam = $schedule->waktu1;
-                    $jam2 = $schedule->waktu2;
+                    $time = $schedule->time;
+                    $status = $schedule->status;
+                    $condition = $schedule->schedule_condition;
 
                     if ($device_id == $session_device_id) {
-                        if ($time == $jam) {
-                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $newSwitchValue]);
-                        } elseif ($time == $jam2) {
-                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $newSwitchValue]);
+                        if ($local_time == $time) {
+                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $status]);
+                            if ($condition == 'once') {
+                                $schedule->where('schedule_id', $schedule_id)->delete();
+                            } elseif ($condition == 'repeat') {
+                                $newDate = Carbon::createFromTimestamp($schedule->time)->addWeeks(1); // Tambahkan 1 minggu
+                                $schedule->where('schedule_id', $schedule_id)->update(['time' => $newDate->timestamp]);
+                            }
                         }
+                        // elseif ($time == $jam2) {
+                        //     ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $newSwitchValue]);
+                        // }
                     }
                 }
             }

@@ -1,30 +1,9 @@
 @extends('layout.main')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid">
     
-    {{--? Start Judul Atas --}}
-    <div class="row mt-3">
-        <div class="col-lg-7">
-            
-            <div class="top-title">
-                <h2 class="">{{$device_name}}</h2>
-                <p>Have a nice day</p>
-            </div>
-        </div>
-        <div class="col-lg-5">
-            <a href="/timers/{{$device_id}}">
-                <button type="button" class="kanan btn btn-outline-info me-2">Countdown</button>
-            </a>
-            <a href="/manage-schedule/{{$device_id}}">
-                <button type="button" class="kanan btn btn-outline-success me-2">Schedule</button>
-            </a>
-            <a href="/manage-status/{{$device_id}}">
-                <button type="button" class="kanan btn btn-outline-primary me-2">Status</button>
-            </a>
-        </div>
-    </div>
-    {{--? End Judul Atas --}}
+   @include('partials.ssc')
 
     <div class="row mt-4">
         <div class="col-xl-12 mb-xl-0 mb-4">
@@ -36,8 +15,9 @@
                             <div class="col-xl-12 col-sm-12 mb-xl-0">
                                 <section class="toggle-switch">
                                     <div class="power-switch">
-                                        <input type="checkbox" class="checkbox-on-off" onchange="ubahstatus3(this.checked)" />
-                                        {{-- <span id="status3">on</span> --}}
+                                        @foreach($data as $item)
+                                            <input type="checkbox" class="checkbox-on-off" {{ $item->switch == 1 ? 'checked' : '' }} onchange="ubahstatus3(this.checked)" />
+                                        @endforeach
 
                                         <div class="button-on-off" id="status3">
                                             <svg class="power-off">
@@ -81,11 +61,11 @@
                                             </div>
                                         </div>
                                     </div> --}}
-                                    <div class="card-body p-3">
+                                    <div class="card-body p-3 d-none d-lg-block">
                                        
                                             <div class="row">
                                                 {{--? Start 1 --}}
-                                                <div class="col-lg-12 mb-lg-0">
+                                                <div class="col-lg-12 mb-lg-0 ">
                                                     <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
                                                         <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                                                             <div class="d-flex align-items-center text-sm">

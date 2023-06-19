@@ -93,9 +93,20 @@ class ManageStatusController extends Controller
                 ->select('voltage', 'current', 'power', 'energy', 'frequency', 'powerfactor')
                 ->first();
 
-            return response()->json($data);
+            // Format decimal fields with a maximum of two decimal places
+            $formattedData = [
+                'voltage' => number_format($data->voltage, 2, '.', ''),
+                'current' => number_format($data->current, 2, '.', ''),
+                'power' => number_format($data->power, 2, '.', ''),
+                'energy' => number_format($data->energy, 2, '.', ''),
+                'frequency' => number_format($data->frequency, 2, '.', ''),
+                'powerfactor' => number_format($data->powerfactor, 2, '.', ''),
+            ];
+
+            return response()->json($formattedData);
         }
     }
+
 
 
     public function relay($value)
@@ -156,7 +167,7 @@ class ManageStatusController extends Controller
         $mac_address = $request->route('mac_address');
 
         $kw = $power / 500;
-        var_dump($energy);
+        // var_dump($energy);
 
         // Create a new TbSensor model
         $tbSensor = new ManageStatusModel();

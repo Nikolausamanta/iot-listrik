@@ -1,14 +1,8 @@
 @extends('layout.main')
 
 @section('content')
-<div class="container-fluid py-4">
-    @if (Session::has('success'))
-        <div class="pt-3">
-            <div class="alert alert-success">
-                {{Session::get('success')}}
-            </div>
-        </div>
-    @endif
+<div class="container-fluid">
+    
     <div class="row mt-3">
         <div class="col-md-4">
             <div class="top-title">
@@ -58,8 +52,11 @@
                               <form onsubmit="return confirm('Apakah Anda yakin ingin menghapus?')" class="d-inline" action="{{ route('manage-device.delete', ['device_id' => $row->device_id]) }}" method="post">
                                 @csrf
                                 @method('DELETE')
-                                <a href="#" onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item">del</a>
+                                <a href="{{ route('manage-device.delete', ['device_id' => $row->device_id]) }}" class="dropdown-item delete-link">del</a>
+
                               </form>
+
+                              
                             </div>
                           </div>
                     </div>
@@ -72,7 +69,66 @@
         </div>
         @endforeach
     </div>
-
-    
 </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteLinks = document.querySelectorAll('.delete-link');
+        deleteLinks.forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        // Mengirim permintaan hapus menggunakan AJAX
+                        deleteData(link.href);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        Swal.fire('Cancelled', 'Your data is safe :)', 'info');
+                    }
+                });
+            });
+        });
+
+        // Menghapus data menggunakan AJAX
+        function deleteData(url) {
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }).then(function () {
+                // Memuat ulang halaman setelah timeout
+                location.reload();
+            });
+        }
+    });
+</script>
+
+
+@if (Session::has('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            // title: 'Success',
+            text: '{{ Session::get('success') }}',
+            icon: 'success',
+            timer: 3000, // Timeout dalam milidetik (3 detik)
+            timerProgressBar: true,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false
+        });
+    });
+</script>
+@endif

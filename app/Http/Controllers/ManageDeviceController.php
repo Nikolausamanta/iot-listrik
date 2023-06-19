@@ -62,25 +62,25 @@ class ManageDeviceController extends Controller
      */
     public function store(Request $request)
     {
-        Session::flash('device_name', $request->device_name);
-        Session::flash('mac_address', $request->mac_address);
-
-        $request->validate([
+        $validationRules = [
             'device_name' => 'required',
             'mac_address' => [
                 'required',
+                'min:12',
                 function ($attribute, $value, $fail) {
-                    $existingData = ManageDeviceModel::where('mac_address', $value)
-                        ->first();
+                    $existingData = ManageDeviceModel::where('mac_address', $value)->first();
 
                     if ($existingData) {
                         $fail('The mac address has already been added.');
                     }
                 },
             ],
-        ], [
+        ];
+
+        $request->validate($validationRules, [
             'device_name.required' => 'The device name field is required.',
             'mac_address.required' => 'The mac address field is required.',
+            'mac_address.min' => 'The mac address must be 12 digits.',
         ]);
 
         $userID = Auth::id();
@@ -113,7 +113,7 @@ class ManageDeviceController extends Controller
             // ManageStatusModel::firstOrCreate($dataSensor);
         }
 
-        return redirect()->to('/alldevice')->with('success', 'Successfully added the device.');
+        return redirect()->to('/alldevice')->with('success', 'Successfully added the device!');
     }
 
 
@@ -160,22 +160,36 @@ class ManageDeviceController extends Controller
     {
         $request->validate([
             'device_name' => 'required',
-            'mac_address' => 'required',
+            'mac_address' => [
+                'required',
+                'min:12',
+                function ($attribute, $value, $fail) use ($id) {
+                    $existingData = ManageDeviceModel::where('mac_address', $value)
+                        ->where('device_id', '<>', $id)
+                        ->first();
+
+                    if ($existingData) {
+                        $fail('The mac address has already been added.');
+                    }
+                },
+            ],
         ], [
-            'device_name.required' => 'diisi woy',
-            'mac_address.required' => 'diisi woy',
+            'device_name.required' => 'The device name field is required.',
+            'mac_address.required' => 'The mac address field is required.',
+            'mac_address.min' => 'The mac address must be 12 digits.',
         ]);
 
-        $device_name = $request->input('device_name');
-        $mac_address = $request->input('mac_address');
-        ManageDeviceModel::where('device_id', $id)->update([
-            'device_name' => $device_name,
-            'mac_address' => $mac_address,
-        ]);
+        $data = [
+            'device_name' => $request->device_name,
+            'mac_address' => $request->mac_address,
+            'user_id' => Auth::id()
+        ];
 
-        // $session_device_id = session('device_id');
-        return redirect()->to('alldevice')->with('success', 'Berhasil melakukan update data');
+        ManageDeviceModel::where('device_id', $id)->update($data);
+
+        return redirect()->to('/alldevice')->with('success', 'Successfully updated the device!');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -205,6 +219,6 @@ class ManageDeviceController extends Controller
         // Menghapus data dari ManageDeviceModel
         ManageDeviceModel::where('device_id', $id)->delete();
 
-        return redirect()->to('alldevice')->with('success', 'Berhasil melakukan delete data');
+        return redirect()->back()->with('success', 'Device has been successfully deleted!');
     }
 }

@@ -22,6 +22,7 @@
     <link id="pagestyle" href={{ url('assets/icon/fontawesome-free/css/all.min.css') }} rel="stylesheet" />
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src={{ url('assets/js/sweetalert2.all.min.js') }}></script>
     <script src={{ url('assets/js/plugins/chartjs.min.js') }}></script>
 
 </head>
@@ -36,7 +37,7 @@
 
     {{--? Start Main Content --}}
     <main class="main-content position-relative border-radius-lg ">
-       {{-- @include('partials.navbar') --}}
+       @include('partials.navbar')
         
         
         @yield('content')
@@ -51,7 +52,6 @@
     <script src={{ url('assets/js/core/bootstrap.min.js') }}></script>
     <script src={{ url('assets/js/plugins/perfect-scrollbar.min.js') }}></script>
     <script src={{ url('assets/js/plugins/smooth-scrollbar.min.js') }}></script>
-   
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {

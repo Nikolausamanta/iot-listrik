@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('tb_schedule', function (Blueprint $table) {
             $table->increments('schedule_id');
+            $table->string('schedule_group', 10);
             $table->string('nama_schedule', 250);
-            $table->string('waktu1');
-            $table->string('waktu2');
-            $table->string('status')->default('0');
+            $table->string('time');
+            $table->boolean('status')->default('0');
+            $table->string('schedule_condition', 10);
             $table->timestamps();
         });
     }

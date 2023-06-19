@@ -7,6 +7,7 @@ use App\Models\TimerModel;
 use Illuminate\Http\Request;
 use App\Models\ManageRelayModel;
 use App\Models\ManageDeviceModel;
+use App\Models\ManageScheduleModel;
 use Illuminate\Support\Facades\Log;
 
 class TimerController extends Controller
@@ -45,11 +46,22 @@ class TimerController extends Controller
             'duration_hour' => 'required|integer|min:0',
             'duration_minute' => 'required|integer|min:0',
             'duration_second' => 'required|integer|min:0',
+        ], [
+            'device_id.required' => 'The Device ID field is required.',
+            'duration_hour.required' => 'The Duration (Hour) field is required.',
+            'duration_hour.integer' => 'The Duration (Hour) field must be an integer.',
+            'duration_hour.min' => 'The Duration (Hour) field must be at least 0.',
+            'duration_minute.required' => 'The Duration (Minute) field is required.',
+            'duration_minute.integer' => 'The Duration (Minute) field must be an integer.',
+            'duration_minute.min' => 'The Duration (Minute) field must be at least 0.',
+            'duration_second.required' => 'The Duration (Second) field is required.',
+            'duration_second.integer' => 'The Duration (Second) field must be an integer.',
+            'duration_second.min' => 'The Duration (Second) field must be at least 0.',
         ]);
 
         $duration = $request->duration_hour * 3600 + $request->duration_minute * 60 + $request->duration_second;
 
-        TimerModel::createOrUpdate($request->device_id, $duration);
+        TimerModel::createOrUpdate($request->device_id, $duration, $request->status);
 
         $device_id_session = session('device_id');
 
@@ -76,14 +88,15 @@ class TimerController extends Controller
     {
         // $dataTimer = TimerModel::where('timer_id', $timer)->get('device_id');
 
-        // foreach ($dataTimer as $schedule) {
-        // $device_id = $schedule->device_id;
-        // $relay = ManageRelayModel::where('device_id', $device_id)->first();
+        // foreach ($dataTimer as $timer) {
+        //     $device_id = $timer->device_id;
+        //     $status = $timer->status;
+        //     $relay = ManageRelayModel::where('device_id', $device_id)->first();
 
-        // Memperbarui nilai switch berdasarkan kondisi yang diberikan
-        // $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
+        //     // Memperbarui nilai switch berdasarkan kondisi yang diberikan
+        //     $newSwitchValue = ($relay->switch == $status);
 
-        // ManageRelayModel::where('device_id', $device_id)->update(['switch' => $newSwitchValue]);
+        //     ManageRelayModel::where('device_id', $device_id)->update(['switch' => $newSwitchValue]);
         // }
 
 
@@ -98,11 +111,18 @@ class TimerController extends Controller
             })->first();
 
             if ($relay) {
-                $newSwitchValue = ($relay->switch == 0) ? 1 : 0;
+                $device_id_relay = $relay->device_id;
 
-                ManageRelayModel::where('device_id', $relay->device_id)->update(['switch' => $newSwitchValue]);
+                $data = TimerModel::where('device_id', $session_device_id)->orderBy('timer_id', 'asc')->get();
 
-                // return $newSwitchValue;
+                foreach ($data as $schedule) {
+                    $device_id = $schedule->device_id;
+                    $status = $schedule->status;
+
+                    if ($device_id == $session_device_id) {
+                        ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $status]);
+                    }
+                }
             }
         }
     }

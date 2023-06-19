@@ -2,21 +2,21 @@ function ubahstatus3(value)
 {
     if(value==true) value="on";
     else value= "off";
-    document.getElementById('status3').innerHTML = value;
+    // document.getElementById('status3').innerHTML = value;
 
     // ajax merubah nilai status relaynya
     var xmlhttp = new XMLHttpRequest();
 
-    xmlhttp.onreadystatechange = function()
-    {
-        if(xmlhttp.readyState == 4 && xmlhttp.status3 == 200)
-        {
-            // ambil respon dari web setelah berhasil merubah nilai
-            document.getElementById('status3').innerHTML = xmlhttp.responseText;
+    // xmlhttp.onreadystatechange = function()
+    // {
+    //     if(xmlhttp.readyState == 4 && xmlhttp.status3 == 200)
+    //     {
+    //         // ambil respon dari web setelah berhasil merubah nilai
+    //         document.getElementById('status3').innerHTML = xmlhttp.responseText;
             
-        }
-    }
-    //execute file PHP untuk merubah nilai di database
+    //     }
+    // }
+    // //execute file PHP untuk merubah nilai di database
     // xmlhttp.open("GET", "/manage-switch/" + value, true);
     xmlhttp.open("GET", "/manage-status/relay/" + value, true);
     xmlhttp.send();
@@ -60,15 +60,16 @@ const clock = setInterval(function time() {
   let sec = dateToday.getSeconds();
 
   if (hour !== null) {
-    hour.textContent = hr;
+    hour.textContent = hr < 10 ? "0" + hr : hr;
   }
   if (minute !== null) {
-    minute.textContent = min;
+    minute.textContent = min < 10 ? "0" + min : min;
   }
   if (seconds !== null) {
-    seconds.textContent = sec;
+    seconds.textContent = sec < 10 ? "0" + sec : sec;
   }
 }, 999);
+
 
 
 // MAC Address
@@ -90,3 +91,25 @@ $(document).ready(function () {
         });
     });
 });
+
+
+// Once or Repeat
+const optionToday = document.getElementById('option_today');
+const optionRepeat = document.getElementById('option_repeat');
+const repeatDays = document.getElementById('repeat_days');
+const repeatWeekly = document.getElementById('repeat_weekly');
+
+optionToday.addEventListener('change', function() {
+    if (this.checked) {
+        repeatDays.style.display = 'none';
+        repeatWeekly.style.display = 'none';
+    }
+});
+
+optionRepeat.addEventListener('change', function() {
+    if (this.checked) {
+        repeatDays.style.display = 'block';
+        repeatWeekly.style.display = 'block';
+    }
+});
+

@@ -22535,7 +22535,7 @@ hr.horizontal.gray-light {
   overflow-y: auto;
   padding: 0;
   box-shadow: none;
-  z-index: 9999;
+  z-index: 1000;
 }
 
 .navbar-vertical.navbar-expand-xs .navbar-collapse {
@@ -23335,7 +23335,7 @@ hr.horizontal.gray-light {
 }
 
 .navbar-vertical.bg-white .navbar-nav>.nav-item .nav-link.active {
-  background-color: #f6f9fc;
+  background-color: #f2f5f7;
   box-shadow: none;
 }
 

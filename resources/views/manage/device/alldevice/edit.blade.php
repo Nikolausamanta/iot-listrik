@@ -1,7 +1,7 @@
 @extends('layout.main')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid">
     <div class="row mt-3">
         <div class="col-md-4">
             <div class="top-title">
@@ -18,17 +18,6 @@
     </div>
     <div class="card">
         <div class="card-header pb-0">
-            @if ($errors->any())
-            <pt-3>
-            <div class="alert alert-danger">
-                <ul>
-                @foreach ($errors->all() as $item)
-                    <li>{{$item}}</li>
-                @endforeach
-                </ul>
-            </div>
-            </pt-3>
-            @endif
             <div class="d-flex align-items-center">
                 <p class="mb-0">Edit Device</p>
             </div>
@@ -43,7 +32,12 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="example-text-input" class="form-control-label">Device Name</label>
-                                    <input type="text" class="form-control" name="device_name" value="{{$edit_device->device_name}}" placeholder="Device Name" aria-label="Name" aria-describedby="name-addon">
+                                    <input type="text" name="device_name" class="form-control @if($errors->has('device_name') || old('device_name') === '') is-invalid @elseif($errors->any()) is-valid @endif" value="{{$edit_device->device_name}}" required>
+                                    @if($errors->has('device_name') || old('device_name') === '')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $errors->first('device_name') ?? 'The device name field is required.' }}</strong>
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -54,7 +48,12 @@
                                     <div class="row">
                                         <label for="example-text-input" class="form-control-label">Mac Address</label>
                                     </div>
-                                    <input id="macAddressInput" type="text" class="form-control" name="mac_address" value="{{$edit_device->mac_address}}" placeholder="Mac Address" readonly>
+                                    <input type="text" name="mac_address" class="form-control @if($errors->has('mac_address') || old('mac_address') === '') is-invalid @elseif($errors->any()) is-valid @endif" value="{{$edit_device->mac_address}}" required>
+                                    @if($errors->has('mac_address') || old('mac_address') === '')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $errors->first('mac_address') ?? 'The mac address field is required.' }}</strong>
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -65,7 +64,9 @@
                         </div>
                         <hr class="horizontal dark">
                         <div class="text-center">
-                            <button type="submit" name="submit" class="btn btn-success btn-lg btn-rounded w-100 mt-4 mb-0">Set Now</button>
+                            <a href="#" class="d-flex justify-content-center btn btn-success btn-md btn-rounded mt-4 mb-0 edit-button" data-device-id="{{ $edit_device->device_id }}">
+                                Set
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -75,3 +76,32 @@
 </div>
 <script src="{{ url('\assets\js\main.js') }}"></script>
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-button');
+        editButtons.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const deviceId = button.getAttribute('data-device-id');
+                const editForm = document.querySelector('form[action="' + window.location.origin + '/manage-device/' + deviceId + '"]');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You are about to edit the device',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, edit it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        editForm.submit();
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        Swal.fire('Cancelled', 'Device edit cancelled', 'info');
+                    }
+                });
+            });
+        });
+    });
+</script>

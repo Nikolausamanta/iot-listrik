@@ -17,6 +17,7 @@ return new class extends Migration
             $table->increments('timer_id');
             $table->dateTime('end_time')->nullable();
             $table->integer('duration')->length(100)->nullable();
+            $table->boolean('status');
             $table->timestamps();
         });
     }
