@@ -31,7 +31,7 @@ class SensorSeeder extends Seeder
             $updatedAtMinute = $startDate->copy()->addMinutes($minute + 1);
 
             for ($i = 0; $i < $totalDataPerMinute; $i++) {
-                $power = $faker->randomFloat(2, 224, 240);
+                $power = $faker->randomFloat(2, 374, 392);
                 $kwh = $power / 500;
 
                 $createdAt = $createdAtMinute->copy()->addSeconds($i);
@@ -46,7 +46,7 @@ class SensorSeeder extends Seeder
                 }
 
                 $data[] = [
-                    'mac_address' => '84:CC:A8:9E:7B:03',
+                    'mac_address' => '11-B0-D0-63-C2-26',
                     'voltage' => $faker->randomFloat(2, 27, 29),
                     'current' => $faker->randomFloat(2, 0.12, 0.16),
                     'power' => $power,

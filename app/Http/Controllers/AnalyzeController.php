@@ -37,26 +37,34 @@ class AnalyzeController extends Controller
         // ->with('estimated', $estimated);
     }
 
-    public function tampil(Request $request)
-    {
-        $device_id = $request->route('device_id');
-        $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
-        $device = ManageDeviceModel::where('device_id', $device_id)->get();
+    // public function tampil(Request $request)
+    // {
+    //     $device_id = $request->route('device_id');
+    //     $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
+    //     $device = ManageDeviceModel::where('device_id', $device_id)->get();
 
-        session(['device_id' => $device_id]);
+    //     session(['device_id' => $device_id]);
 
-        return view('analyze.index', [
-            'title' => 'Status'
-        ])
-            ->with('device_id', $device_id)
-            ->with('device_name', $device_name)
-            ->with('device', $device);
-    }
+    //     return view('analyze.index', [
+    //         'title' => 'Status'
+    //     ])
+    //         ->with('device_id', $device_id)
+    //         ->with('device_name', $device_name)
+    //         ->with('device', $device);
+    // }
 
     public function forecast()
     {
+        $user_id = Auth::id();
+
+        $mac_addresses = DB::table('tb_device')
+            ->where('user_id', $user_id)
+            ->pluck('mac_address')
+            ->toArray();
+
         // Ambil data historis biaya listrik dari database
         $readings = ManageStatusModel::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(kwh) as total_kwh')
+            ->whereIn('mac_address', $mac_addresses)
             ->groupBy('year', 'month')
             ->get();
 
@@ -117,38 +125,34 @@ class AnalyzeController extends Controller
     {
         $user_id = Auth::id();
 
-        $electricityData = Cache::remember('total_kwh_this_month_' . $user_id, Carbon::now()->addHours(1), function () use ($user_id) {
-            $lastMonthData = DB::table('tb_device')
+        $lastMonthData = DB::table('tb_device')
+            ->join('tb_sensor', 'tb_device.mac_address', '=', 'tb_sensor.mac_address')
+            ->where('tb_device.user_id', $user_id)
+            ->orderByDesc('tb_sensor.created_at')
+            ->select('tb_sensor.created_at')
+            ->first();
+
+        if ($lastMonthData) {
+            $created_at = Carbon::parse($lastMonthData->created_at);
+            $startOfMonth = $created_at->startOfMonth();
+
+            $kwhPerUser = DB::table('tb_device')
                 ->join('tb_sensor', 'tb_device.mac_address', '=', 'tb_sensor.mac_address')
                 ->where('tb_device.user_id', $user_id)
-                ->orderByDesc('tb_sensor.created_at')
-                ->select('tb_sensor.created_at')
+                ->whereMonth('tb_sensor.created_at', $startOfMonth->month)
+                ->whereYear('tb_sensor.created_at', $startOfMonth->year)
+                ->select(DB::raw('SUM(tb_sensor.kwh) as total_kwh'))
                 ->first();
 
-            if ($lastMonthData) {
-                $created_at = Carbon::parse($lastMonthData->created_at);
-                $startOfMonth = $created_at->startOfMonth();
-
-                $kwhPerUser = DB::table('tb_device')
-                    ->join('tb_sensor', 'tb_device.mac_address', '=', 'tb_sensor.mac_address')
-                    ->where('tb_device.user_id', $user_id)
-                    ->whereMonth('tb_sensor.created_at', $startOfMonth->month)
-                    ->whereYear('tb_sensor.created_at', $startOfMonth->year)
-                    ->select(DB::raw('SUM(tb_sensor.kwh) as total_kwh'))
-                    ->first();
-
-                if ($kwhPerUser) {
-                    $kwh = $kwhPerUser->total_kwh * (1 / 2582);
-                    $electricityData = $kwh * 1352;
-                } else {
-                    $electricityData = 0; // Jika tidak ada data, set nilai menjadi 0
-                }
+            if ($kwhPerUser) {
+                $kwh = $kwhPerUser->total_kwh * (1 / 2582);
+                $electricityData = $kwh * 1352;
             } else {
-                $electricityData = 0; // Jika tidak ada data bulan terakhir, set nilai menjadi 0
+                $electricityData = 0; // Jika tidak ada data, set nilai menjadi 0
             }
-
-            return $electricityData;
-        });
+        } else {
+            $electricityData = 0; // Jika tidak ada data bulan terakhir, set nilai menjadi 0
+        }
 
         return $electricityData;
     }
@@ -181,49 +185,47 @@ class AnalyzeController extends Controller
         return $electricityData;
     }
 
+    // Yang PerDevice atau perperangkat
     public function getTotalKwhPerMonth()
     {
         $user_id = Auth::id();
 
-        $electricityData = Cache::remember('total_kwh_per_month_' . $user_id, Carbon::now()->addHours(1), function () use ($user_id) {
-            $deviceData = DB::table('tb_device')
-                ->where('user_id', $user_id)
-                ->pluck('device_name', 'mac_address')
-                ->toArray();
+        $deviceData = DB::table('tb_device')
+            ->where('user_id', $user_id)
+            ->pluck('device_name', 'mac_address')
+            ->toArray();
 
-            $mac_addresses = array_keys($deviceData);
+        $mac_addresses = array_keys($deviceData);
 
-            $lastMonth = DB::table('tb_sensor')
-                ->whereIn('mac_address', $mac_addresses)
-                ->max('created_at');
+        $lastMonth = DB::table('tb_sensor')
+            ->whereIn('mac_address', $mac_addresses)
+            ->max('created_at');
 
-            $kwhPerMonth = DB::table('tb_sensor')
-                ->whereIn('mac_address', $mac_addresses)
-                ->whereMonth('created_at', date('m', strtotime($lastMonth)))
-                ->groupBy('mac_address')
-                ->select('mac_address', DB::raw('SUM(kwh) as total_kwh'))
-                ->get();
+        $kwhPerMonth = DB::table('tb_sensor')
+            ->whereIn('mac_address', $mac_addresses)
+            ->whereMonth('created_at', date('m', strtotime($lastMonth)))
+            ->groupBy('mac_address')
+            ->select('mac_address', DB::raw('SUM(kwh) as total_kwh'))
+            ->get();
 
-            $electricityData = [];
+        $electricityData = [];
 
-            foreach ($kwhPerMonth as $reading) {
-                $mac_address = $reading->mac_address;
-                $device_name = $deviceData[$mac_address];
-                $kwh = $reading->total_kwh * (1 / 2582);
-                $formatted_kwh = number_format($kwh, 2, '.', '');
+        foreach ($kwhPerMonth as $reading) {
+            $mac_address = $reading->mac_address;
+            $device_name = $deviceData[$mac_address];
+            $kwh = $reading->total_kwh * (1 / 2582);
+            $formatted_kwh = number_format($kwh, 2, '.', '');
 
-                $electricityData[] = [
-                    'mac_address' => $mac_address,
-                    'device_name' => $device_name,
-                    'total_kwh_perdevice' => $formatted_kwh,
-                ];
-            }
-
-            return $electricityData;
-        });
+            $electricityData[] = [
+                'mac_address' => $mac_address,
+                'device_name' => $device_name,
+                'total_kwh_perdevice' => $formatted_kwh,
+            ];
+        }
 
         return response()->json($electricityData);
     }
+
 
 
     public function getTotalKwh()

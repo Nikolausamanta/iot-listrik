@@ -19,29 +19,25 @@ class SessionController extends Controller
 
     public function login(Request $request)
     {
-        Session::flash('email', $request->email);
-        Session::flash('password', $request->password);
-
         $request->validate([
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
         ], [
-            'email.required' => 'email diisi woy',
-            'password.required' => 'password diisi woy',
+            'email.required' => 'Email must be filled in.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.required' => 'Password must be filled in.',
         ]);
 
-        $infologin = [
-            'email' => $request->email,
-            'password' => $request->password,
-        ];
+        $email = $request->email;
+        $password = $request->password;
 
-        if (Auth::attempt($infologin)) {
-            //kalau authentication sukses
-            return redirect()->to('/')->with('success', Auth::user()->name . ' berhasil melakukan Login');
-        } else {
-            // kalau authentication gagal
-            return redirect('sesi')->withErrors('Username dan Password Salah');
+        $user = User::where('email', $email)->first();
+
+        if (!$user || !Auth::attempt(['email' => $email, 'password' => $password])) {
+            return redirect('sesi')->withErrors(['invalid_credentials' => 'Invalid email or password.'])->withInput($request->except('password'));
         }
+
+        return redirect()->to('/')->with('success', Auth::user()->name . ' successfully logged in');
     }
 
     public function logout()
@@ -59,23 +55,21 @@ class SessionController extends Controller
 
     public function create(Request $request)
     {
-        Session::flash('name', $request->name);
-        Session::flash('email', $request->email);
-        Session::flash('password', $request->password);
-
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
+            'password_confirmation' => 'required|same:password',
         ], [
-            'name.required' => 'name diisi woy',
-            'email.required' => 'email diisi woy',
-            'email.email' => 'Silahkan masukkan email yang valid',
-            'email.unique' => 'Email sudah pernah digunakan, silakan pilih email yang lain',
-            'password.required' => 'password diisi woy',
-            'password.min' => 'Minimum password yang dizikan adalh 6 karakter',
+            'name.required' => 'Please enter your name.',
+            'email.required' => 'Please enter your email.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.unique' => 'The email address has already been used, please choose a different email.',
+            'password.required' => 'Please enter a password.',
+            'password.min' => 'The password must be at least 6 characters.',
+            'password_confirmation.required' => 'Please confirm your password.',
+            'password_confirmation.same' => 'The password confirmation does not match the password entered.',
         ]);
-
 
         $data = [
             'name' => $request->name,
