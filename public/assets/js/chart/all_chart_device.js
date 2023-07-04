@@ -182,7 +182,13 @@ function fetchDataPowerChart() {
       }, []);
 
       // Memperbarui data grafik
-      updated_at = reducedData.map(item => item.updated_at);
+      updated_at = reducedData.map(item => {
+        var dateTime = new Date(item.updated_at);
+        var hour = dateTime.getHours().toString().padStart(2, '0');
+        var minute = dateTime.getMinutes().toString().padStart(2, '0');
+        var second = dateTime.getSeconds().toString().padStart(2, '0');
+        return hour + ':' + minute + ':' + second;
+      });
       power = reducedData.map(item => item.power);
       console.log(power);
       // Memperbarui data dan label pada grafik Chart.js
@@ -195,6 +201,7 @@ function fetchDataPowerChart() {
       console.error('Error fetching data from server:', error);
     });
 }
+
 
 // Fungsi untuk mengambil data dari server
 function fetchDataKwhPerDevice() {

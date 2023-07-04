@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\TimerModel;
 use Illuminate\Http\Request;
 use App\Models\ManageRelayModel;
 use App\Models\ManageDeviceModel;
 use App\Models\ManageStatusModel;
+use Illuminate\Support\Facades\DB;
+use App\Models\ManageScheduleModel;
 use Symfony\Component\VarDumper\VarDumper;
 
 class ManageStatusController extends Controller
@@ -27,6 +30,7 @@ class ManageStatusController extends Controller
     // }
 
 
+
     public function tampil(Request $request)
     {
         $device_id = $request->route('device_id');
@@ -38,6 +42,7 @@ class ManageStatusController extends Controller
         //     $data1 = ManageStatusModel::where('mac_address', $mac_address)->latest('updated_at')->take(1)->get();
         // }
 
+        $totalKwh = $this->getTotalKwhPerMonth();
 
         // // $data1 = ManageStatusModel::where('device_id', $device_id)->get();
         $data2 = ManageRelayModel::where('device_id', $device_id)->get();
@@ -49,6 +54,7 @@ class ManageStatusController extends Controller
         ])
             ->with('device_name', $device_name)
             ->with('data', $data2)
+            ->with('totalKwh', $totalKwh)
             ->with('device_id', $device_id);
     }
 
@@ -139,6 +145,67 @@ class ManageStatusController extends Controller
         return $dddd[0];
     }
 
+    public function getFormattedTime($time)
+    {
+        $carbonTime = Carbon::createFromTimestamp($time);
+        $formattedTime = $carbonTime->format('D H:i:s');
+        $formattedTime = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], $formattedTime);
+        return $formattedTime;
+    }
+
+    public function send_schedule_data(Request $request)
+    {
+        $mac_address = $request->route('mac_address');
+        $schedules = ManageDeviceModel::join('tb_schedule', 'tb_device.device_id', '=', 'tb_schedule.device_id')
+            ->where('tb_device.mac_address', $mac_address)
+            ->distinct()
+            ->select('schedule_id', 'nama_schedule', 'time', 'status', 'schedule_condition')
+            ->orderBy('time', 'asc')
+            ->limit(1)
+            ->get();
+
+
+        $Hschedule = [];
+        foreach ($schedules as $a) {
+            $formattedTime = $this->getFormattedTime($a->time);
+            $Cstatus = $a->status == 1 ? 'on' : 'off';
+            $Hschedule[] = [
+                'schedule_id' => $a->schedule_id,
+                'nama_schedule' => $a->nama_schedule,
+                'time' => $formattedTime,
+                'status' => $Cstatus,
+                'schedule_condition' => $a->schedule_condition,
+            ];
+        }
+
+        return response()->json($Hschedule);
+    }
+
+    public function send_timer_data(Request $request)
+    {
+        $mac_address = $request->route('mac_address');
+        $aaa = ManageDeviceModel::join('tb_timer', 'tb_device.device_id', '=', 'tb_timer.device_id')
+            ->where('tb_device.mac_address', $mac_address)
+            ->distinct()
+            ->select('timer_id', 'device_name', 'duration', 'status')
+            ->limit(1)
+            ->get();
+        // ->implode(', ');
+        // $bbb = join($aaa);
+        $Hstatus = [];
+        foreach ($aaa as $a) {
+            $Cstatus = $a->status == 1 ? 'on' : 'off';
+            $Hstatus[] = [
+                'timer_id' => $a->timer_id,
+                'device_name' => $a->device_name,
+                'duration' => $a->duration,
+                'status' => $Cstatus,
+            ];
+        }
+        // return $Hstatus;
+        return response()->json($Hstatus);
+    }
+
     public function send_mac_address(Request $request)
     {
         $mac_address = $request->route('mac_address');
@@ -191,6 +258,64 @@ class ManageStatusController extends Controller
             'title' => 'Status'
         ])->with('sensor', $sensor);
     }
+
+    // Yang PerDevice atau perperangkat
+    // public function getTotalKwhPerMonth()
+    // {
+    //     $session_device_id = session('device_id');
+    //     $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+
+    //     if ($device) {
+    //         $mac_address = $device->mac_address;
+
+    //         $lastMonth = DB::table('tb_sensor')
+    //             ->where('mac_address', $mac_address)
+    //             ->max('created_at');
+
+    //         $kwhPerMonth = DB::table('tb_sensor')
+    //             ->where('mac_address', $mac_address)
+    //             ->whereMonth('created_at', date('m', strtotime($lastMonth)))
+    //             ->groupBy('mac_address')
+    //             ->select('mac_address', DB::raw('SUM(kwh) as total_kwh'))
+    //             ->first();
+
+    //         $kwh = $kwhPerMonth->total_kwh * (1 / 2582);
+    //         $formatted_kwh = number_format($kwh, 2, '.', '');
+
+    //         return $formatted_kwh;
+    //     }
+    // }
+
+    public function getTotalKwhPerMonth()
+    {
+        $session_device_id = session('device_id');
+        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+
+        if ($device) {
+            $mac_address = $device->mac_address;
+
+            $lastMonth = DB::table('tb_sensor')
+                ->where('mac_address', $mac_address)
+                ->max('created_at');
+
+            $kwhPerMonth = DB::table('tb_sensor')
+                ->where('mac_address', $mac_address)
+                ->whereMonth('created_at', date('m', strtotime($lastMonth)))
+                ->groupBy('mac_address')
+                ->select('mac_address', DB::raw('SUM(kwh) as total_kwh'))
+                ->first();
+
+            // Periksa apakah $kwhPerMonth bernilai null, jika ya, maka set total_kwh menjadi 0
+            $total_kwh = $kwhPerMonth ? $kwhPerMonth->total_kwh : 0;
+
+            $kwh = $total_kwh * (1 / 2582);
+            $formatted_kwh = number_format($kwh, 2, '.', '');
+
+            return $formatted_kwh;
+        }
+    }
+
+
 
     /**
      * Display a listing of the resource.

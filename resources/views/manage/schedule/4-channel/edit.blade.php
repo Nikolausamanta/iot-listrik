@@ -20,7 +20,8 @@
         </div>
         
         <div class="card-body pb-3">
-          <form action='{{url('manage-schedule/'. $edit_schedule->schedule_id)}}' method='post' role="form text-left">
+          <form id="editForm" action='{{url('manage-schedule/'. $edit_schedule->schedule_id)}}' method='post' role="form text-left">
+
             @csrf
             @method('PUT')
             
@@ -114,67 +115,70 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-6">
+              <div class="col-lg-6">
                   <div class="text-center">
-                    <button type="submit" name="submit" class="btn btn-success btn-lg btn-rounded px-5 mt-4 mb-0 set-button">Set</button>
+                    <button type="button" class="btn btn-success btn-lg btn-rounded px-5 mt-4 mb-0 set-button">Set Now</button>
                   </div>
-                </div>
-                <div class="col-lg-6">
-                <div class="text-center">
-                  <a href="{{url('manage-schedule/'.$device_id)}}" class="btn btn-danger btn-lg btn-rounded px-5 mt-4 mb-0">Cancel</a>
               </div>
+              <div class="col-lg-6">
+                  <div class="text-center">
+                      <a href="{{url('manage-schedule/'.$device_id)}}" class="btn btn-danger btn-lg btn-rounded px-5 mt-4 mb-0">Cancel</a>
+                  </div>
               </div>
-            </div>
+          </div>
           </form>
         </div>
+        
 </div>
 
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      const editForm = document.querySelector('form[action^="{{url('manage-schedule/')}}"]');
-      const cancelButton = document.querySelector('a.btn-danger');
+  const editForm = document.getElementById('editForm');
+  const setNowButton = document.querySelector('.set-button');
 
-      editForm.addEventListener('submit', function (event) {
-          event.preventDefault();
+  editForm.addEventListener('submit', function (event) {
+    event.preventDefault();
 
-          Swal.fire({
-              title: 'Are you sure?',
-              text: 'You are about to edit the schedule',
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonText: 'Yes, edit it!',
-              cancelButtonText: 'No, cancel!',
-              reverseButtons: true
-          }).then(function (result) {
-              if (result.isConfirmed) {
-                  editForm.submit();
-              } else if (result.dismiss === Swal.DismissReason.cancel) {
-                  Swal.fire('Cancelled', 'Schedule edit cancelled', 'info');
-              }
-          });
-      });
-
-      cancelButton.addEventListener('click', function (event) {
-          event.preventDefault();
-
-          Swal.fire({
-              title: 'Are you sure?',
-              text: 'You are about to cancel the edit',
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonText: 'Yes, cancel it!',
-              cancelButtonText: 'No, keep editing!',
-              reverseButtons: true
-          }).then(function (result) {
-              if (result.isConfirmed) {
-                  window.location.href = cancelButton.href;
-              } else if (result.dismiss === Swal.DismissReason.cancel) {
-                  Swal.fire('Cancelled', 'Edit cancellation cancelled', 'info');
-              }
-          });
-      });
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You are about to edit the schedule',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, edit it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then(function (result) {
+      if (result.isConfirmed) {
+        editForm.submit();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire('Cancelled', 'Schedule edit cancelled', 'info');
+      }
+    });
   });
+
+  setNowButton.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You are about to set the schedule now',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, set it now!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then(function (result) {
+      if (result.isConfirmed) {
+        editForm.submit();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire('Cancelled', 'Schedule set cancelled', 'info');
+      }
+    });
+  });
+});
+
 </script>
+
 
 

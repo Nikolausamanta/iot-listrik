@@ -21,7 +21,8 @@
     <link id="pagestyle" href={{ url('assets/css/main.css') }} rel="stylesheet" />
     <link id="pagestyle" href={{ url('assets/icon/fontawesome-free/css/all.min.css') }} rel="stylesheet" />
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+    <script src={{ url('assets/js/jquery.min.js') }}></script>
     <script src={{ url('assets/js/sweetalert2.all.min.js') }}></script>
     <script src={{ url('assets/js/plugins/chartjs.min.js') }}></script>
 

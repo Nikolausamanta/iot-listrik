@@ -47,7 +47,7 @@
         <div class="col-lg-7 mb-lg-0 mb-4">
             <div class="card z-index-2 h-100">
                 <div class="card-header pb-0 pt-3 bg-transparent">
-                    <h6 class="text-capitalize">Coast: Month</h6>
+                    <h6 class="text-capitalize">Cost Predictions</h6>
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
@@ -87,7 +87,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-md">Predicted This Month </span>
-                                        <h3 class="text-dark" id="total-voltage">Rp. </h3>
+                                        <h3 class="text-dark" id="total-voltage">Rp. {{$prediction_this_month}}</h3>
                                     </div>
                                 </li>
                             </div>
@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="text-md">Estimated Savings</span>
-                                        <h3 class="text-dark" id="total-voltage">Rp. </h3>
+                                        <h3 class="text-dark" id="total-voltage">Rp. {{$before_this_month}}</h3>
                                     </div>
                                 </li>
                             </div>

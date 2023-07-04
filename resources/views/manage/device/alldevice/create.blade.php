@@ -57,16 +57,26 @@
                             </div>
                             <div class="col-md-3">
                                 <a href="#" class="d-flex justify-content-center btn btn-secondary btn-md btn-rounded mt-4 mb-0" id="triggerButton">
-                                    Set
+                                    Get
                                 </a>
                             </div>
                         </div>
                         <hr class="horizontal dark">
                         <div class="text-center">
-                            <button type="submit" name="submit" class="btn btn-success btn-lg btn-rounded w-100 mt-4 mb-0">Set Now</button>
+                            <button type="submit" name="submit" class="btn btn-success btn-lg btn-rounded w-100 mt-4 mb-0">Add Now</button>
                         </div>
                     </form>
                 </div>
+                <div class="col-lg-5">
+                    <div class="mt-4 d-none d-lg-block">
+                        <div class="col-xl-12 mb-xl-0 mb-4">
+                            <div class="card bg-transparent shadow-xl">
+                                <div class="overflow-hidden position-relative border-radius-xl" style="background-size: cover; height: 285px; width: 100%; background-image: url('/assets/img/card-device/1.jpg');">   </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>

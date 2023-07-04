@@ -9,7 +9,6 @@ use App\Models\MacAddressModel;
 use App\Models\ManageRelayModel;
 use App\Models\ManageDeviceModel;
 use App\Models\ManageStatusModel;
-use App\Models\ManageScheduleModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 

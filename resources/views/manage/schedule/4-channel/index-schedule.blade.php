@@ -16,8 +16,8 @@
           <div class="row">
             <div class="col-lg-8 mb-lg-0 mb-4">
               {{--? Start Upcoming  --}}
-
-              <div class="row mt-3 d-none d-lg-block">
+    
+              <div class="row mt-3">
                 <div class="col-md-12 mb-lg-0 mb-4">
                   <div class="card">
                       <div class="card-header pb-0 p-3">
@@ -25,44 +25,42 @@
                               <div class="col-6 d-flex align-items-center">
                                   <h6 class="mb-0">Upcoming</h6>
                               </div>
-                              {{-- <div class="col-6 text-end">
-                                  <a class="btn bg-gradient-dark mb-0" href="javascript:;"><i class="fas fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add New Card</a>
-                              </div> --}}
                           </div>
                       </div>
                       <div class="card-body p-3">
-                          @foreach ($upcoming as $data)  
-                              <div class="row">
+                          @if($upcoming)
+                              <div class="row ">
                                   {{--? Start 1 --}}
-                                  <div class="col-lg-4 mb-lg-0 mb-4">
-                                      <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row" id="card1">
-                                          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                              <div class="d-flex align-items-center text-sm">
-                                                  <button class="btn btn-link text-dark text-sm mb-0 px-0">
-                                                    <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
-                                                  </button>
-                                              </div>
-                                              <div class="d-flex flex-column">
-                                                <span class="text-sm">Schedule Name</span>
-                                                <p class="text-md text-dark font-weight-bold">{{$data->nama_schedule}}</p>
-                                              </div>
-                                          </li>
-                                      </div>
+                                  <div class="col-lg-4 mb-lg-0 mb-4 col-6">
+                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
+                                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                            {{-- <div class="d-flex align-items-center text-sm">
+                                                <button class="btn btn-link text-dark text-sm mb-0 px-0">
+                                                  <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
+                                                </button>
+                                            </div> --}}
+                                            <div class="d-flex flex-column">
+                                              <span class="text-sm">Schedule Name</span>
+                                              <p class="text-md text-dark font-weight-bold mb-0">{{$upcoming->nama_schedule}}</p>
+
+                                            </div>
+                                        </li>
+                                    </div>
                                   </div>
                                   {{--? End 1 --}}
 
                                   {{--? Start 2 --}}
-                                  <div class="col-lg-4 mb-lg-0 mb-4">
-                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row" id="card2">
+                                  <div class="col-lg-4 mb-lg-0 mb-4 col-6">
+                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
                                         <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                            <div class="d-flex align-items-center text-sm">
+                                            {{-- <div class="d-flex align-items-center text-sm">
                                                 <button class="btn btn-link text-dark text-sm mb-0 px-0">
                                                   <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
                                                 </button>
-                                            </div>
+                                            </div> --}}
                                             <div class="d-flex flex-column">
                                               <span class="text-sm">Time</span>
-                                              <p class="text-md text-dark font-weight-bold mb-0">{{ \Carbon\Carbon::createFromTimestamp($data->time, 'Asia/Singapore')->format('l, j F Y, H:i:s') }}</p>
+                                              <p class="text-md text-dark font-weight-bold mb-0">{{ \Carbon\Carbon::createFromTimestamp($upcoming->time, 'Asia/Singapore')->format('l, H:i:s') }}</p>
                                             </div>
                                         </li>
                                     </div>
@@ -70,22 +68,40 @@
                                   {{--? End 2 --}}
                                   
                                   {{--? Start 3 --}}
-                                  <div class="col-lg-4 mb-lg-0 mb-4">
-                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row" id="card3">
+                                  <div class="col-lg-2 mb-lg-0 mb-4 col-6">
+                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
                                         <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                            <div class="d-flex align-items-center text-sm">
+                                            {{-- <div class="d-flex align-items-center text-sm">
                                                 <button class="btn btn-link text-dark text-sm mb-0 px-0">
                                                   <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
                                                 </button>
-                                            </div>
+                                            </div> --}}
                                             <div class="d-flex flex-column">
                                               <span class="text-sm">Status</span>
-                                              <p class="text-md text-dark font-weight-bold">{{$data->status == 1 ? 'On' : 'Off'}}</p>
+                                              <p class="text-md text-dark font-weight-bold mb-0">{{$upcoming->status == 1 ? 'On' : 'Off'}}</p>
                                             </div>
                                         </li>
                                     </div>
                                   </div>
                                   {{--? End 3 --}}
+
+                                  {{--? Start 4 --}}
+                                  <div class="col-lg-2 mb-lg-0 mb-4 col-6">
+                                    <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row" id="card4">
+                                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                            {{-- <div class="d-flex align-items-center text-sm">
+                                                <button class="btn btn-link text-dark text-sm mb-0 px-0">
+                                                  <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
+                                                </button>
+                                            </div> --}}
+                                            <div class="d-flex flex-column">
+                                              <span class="text-sm">Condition</span>
+                                              <p class="text-md text-dark font-weight-bold mb-0">{{$upcoming->schedule_condition == 'Once' ? 'Only' : 'Repeat'}}</p>
+                                            </div>
+                                        </li>
+                                    </div>
+                                  </div>
+                                  {{--? End 4--}}
                                   <script>
                                     window.addEventListener('DOMContentLoaded', () => {
                                       const card1 = document.getElementById('card1');
@@ -99,7 +115,9 @@
                                   </script>
                                   
                               </div>
-                          @endforeach
+                            @else
+                                <p>No upcoming schedule found.</p>
+                            @endif
                       </div>
                   </div>
                 </div>
@@ -258,6 +276,34 @@
       
   });
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+        const deleteForms = document.querySelectorAll('.delete-form');
+        deleteForms.forEach(function (form) {
+            const deleteButton = form.querySelector('.delete-button');
+            deleteButton.addEventListener('click', function (event) {
+                event.preventDefault(); // Menghentikan pengiriman form secara langsung
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        Swal.fire('Cancelled', 'Your data is safe :)', 'info');
+                    }
+                });
+            });
+        });
+
+    });
+</script>
 
 @if (Session::has('success'))
     <script>
@@ -266,7 +312,7 @@
                 // title: 'Success',
                 text: '{{ Session::get('success') }}',
                 icon: 'success',
-                timer: 3000, // Timeout dalam milidetik (3 detik)
+                timer: 4000, // Timeout dalam milidetik (3 detik)
                 timerProgressBar: true,
                 toast: true,
                 position: 'top-end',

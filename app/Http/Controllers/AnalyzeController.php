@@ -23,17 +23,32 @@ class AnalyzeController extends Controller
     {
         $userId = Auth::user()->id;
         $data = AllDeviceModel::where('user_id', $userId)->get();
-        $nextMonth = $this->forecast();
-        $formattedNextMonth = number_format((float)$nextMonth, 2);
-        $this_month = number_format($this->getTotalKwhThisMonth(), 2);
 
-        // $estimated = number_format(max(abs($this->forecast() - $this->getTotalKwhBeforeLastMonth()), 0), 2);
+        $this_month = number_format($this->getTotalKwhThisMonth(), 2);
+        $next_month = number_format($this->getTotalKwhNextMonth(), 2);
+        $prediction_this_month = number_format($this->getPredictionTotalKwhThisMonth(), 2);
+
+
+        // Mengambil total kwh sebelum bulan ini
+        $totalKwhBeforeThisMonth = $this->getTotalKwhBeforeThisMonth();
+
+        // Mengambil prediksi total kwh bulan ini
+        $predictionTotalKwhThisMonth = $this->getPredictionTotalKwhThisMonth();
+
+        // Menghitung selisih antara total kwh sebelum bulan ini dan prediksi total kwh bulan ini
+        $difference = $totalKwhBeforeThisMonth - $predictionTotalKwhThisMonth;
+
+        // Menetapkan nilai selisih menjadi nol jika hasilnya negatif
+        $difference = $difference < 0 ? 0 : $difference;
+        $estimated_savings = number_format($difference, 2);
 
         return view('analyze.index', [
             'title' => 'Analyze'
         ], compact('data'))
-            ->with('next_month', $formattedNextMonth)
-            ->with('this_month', $this_month);
+            ->with('next_month', $next_month)
+            ->with('this_month', $this_month)
+            ->with('before_this_month', $estimated_savings)
+            ->with('prediction_this_month', $prediction_this_month);
         // ->with('estimated', $estimated);
     }
 
@@ -121,39 +136,99 @@ class AnalyzeController extends Controller
         return $monthlyData;
     }
 
-    public function getTotalKwhThisMonth()
+    public function getTotalKwhNextMonth()
     {
-        $user_id = Auth::id();
+        // Mengambil data historis biaya listrik dari database
+        $readings = ManageStatusModel::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(kwh) as total_kwh')
+            ->groupBy('year', 'month')
+            ->get();
 
-        $lastMonthData = DB::table('tb_device')
-            ->join('tb_sensor', 'tb_device.mac_address', '=', 'tb_sensor.mac_address')
-            ->where('tb_device.user_id', $user_id)
-            ->orderByDesc('tb_sensor.created_at')
-            ->select('tb_sensor.created_at')
-            ->first();
+        $electricityData = [];
 
-        if ($lastMonthData) {
-            $created_at = Carbon::parse($lastMonthData->created_at);
-            $startOfMonth = $created_at->startOfMonth();
-
-            $kwhPerUser = DB::table('tb_device')
-                ->join('tb_sensor', 'tb_device.mac_address', '=', 'tb_sensor.mac_address')
-                ->where('tb_device.user_id', $user_id)
-                ->whereMonth('tb_sensor.created_at', $startOfMonth->month)
-                ->whereYear('tb_sensor.created_at', $startOfMonth->year)
-                ->select(DB::raw('SUM(tb_sensor.kwh) as total_kwh'))
-                ->first();
-
-            if ($kwhPerUser) {
-                $kwh = $kwhPerUser->total_kwh * (1 / 2582);
-                $electricityData = $kwh * 1352;
-            } else {
-                $electricityData = 0; // Jika tidak ada data, set nilai menjadi 0
-            }
-        } else {
-            $electricityData = 0; // Jika tidak ada data bulan terakhir, set nilai menjadi 0
+        foreach ($readings as $reading) {
+            $kwh = $reading->total_kwh * (1 / 2582);
+            $electricityData[] = $kwh * 1352;
         }
 
+        // Menghitung jumlah data
+        $dataCount = count($electricityData);
+
+        // Membuat array untuk menyimpan data independen (bulan ke-) dan dependen (biaya listrik)
+        $x = range(1, $dataCount);
+        $y = $electricityData;
+
+        // Menghitung persamaan regresi linier menggunakan metode kuadrat terkecil
+        $xMean = array_sum($x) / $dataCount;
+        $yMean = array_sum($y) / $dataCount;
+
+        $numerator = 0;
+        $denominator = 0;
+
+        for ($i = 0; $i < $dataCount; $i++) {
+            $numerator += ($x[$i] - $xMean) * ($y[$i] - $yMean);
+            $denominator += pow(($x[$i] - $xMean), 2);
+        }
+
+        $slope = $numerator / $denominator;
+        $intercept = $yMean - ($slope * $xMean);
+
+        // Prediksi biaya listrik bulan berikutnya
+        $nextMonth = $dataCount + 1;
+        $prediction = $slope * $nextMonth + $intercept;
+
+        // Menampilkan prediksi biaya listrik bulan berikutnya
+        return $prediction;
+    }
+
+    public function getTotalKwhBeforeThisMonth()
+    {
+        // Mengambil data historis biaya listrik dari database
+        $currentMonth = date('n'); // Mendapatkan bulan saat ini (1-12)
+        $currentYear = date('Y'); // Mendapatkan tahun saat ini (4 digit)
+        $previousMonth = $currentMonth - 1;
+
+        // Jika bulan saat ini adalah Januari, maka bulan sebelumnya adalah Desember tahun sebelumnya
+        if ($previousMonth == 0) {
+            $previousMonth = 12;
+            $currentYear -= 1;
+        }
+
+        $previousMonthData = ManageStatusModel::selectRaw('SUM(kwh) as total_kwh')
+            ->whereMonth('created_at', $previousMonth)
+            ->whereYear('created_at', $currentYear)
+            ->first();
+
+        if ($previousMonthData) {
+            $kwh = $previousMonthData->total_kwh * (1 / 2582);
+            $electricityData = $kwh * 1352;
+        } else {
+            $electricityData = 0;
+        }
+
+        // Menampilkan data aktual biaya listrik bulan sebelumnya
+        return $electricityData;
+    }
+
+
+    public function getTotalKwhThisMonth()
+    {
+        // Mengambil data historis biaya listrik dari database
+        $currentMonth = date('n'); // Mendapatkan bulan saat ini (1-12)
+        $currentYear = date('Y'); // Mendapatkan tahun saat ini (4 digit)
+
+        $currentMonthData = ManageStatusModel::selectRaw('SUM(kwh) as total_kwh')
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->first();
+
+        if ($currentMonthData) {
+            $kwh = $currentMonthData->total_kwh * (1 / 2582);
+            $electricityData = $kwh * 1352;
+        } else {
+            $electricityData = 0;
+        }
+
+        // Menampilkan data aktual biaya listrik bulan ini
         return $electricityData;
     }
 
@@ -184,6 +259,51 @@ class AnalyzeController extends Controller
 
         return $electricityData;
     }
+
+    public function getPredictionTotalKwhThisMonth()
+    {
+        // Mengambil data historis biaya listrik dari database
+        $readings = ManageStatusModel::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(kwh) as total_kwh')
+            ->groupBy('year', 'month')
+            ->get();
+
+        $electricityData = [];
+
+        foreach ($readings as $reading) {
+            $kwh = $reading->total_kwh * (1 / 2582);
+            $electricityData[] = $kwh * 1352;
+        }
+
+        // Menghitung jumlah data
+        $dataCount = count($electricityData);
+
+        // Membuat array untuk menyimpan data independen (bulan ke-) dan dependen (biaya listrik)
+        $x = range(1, $dataCount);
+        $y = $electricityData;
+
+        // Menghitung persamaan regresi linier menggunakan metode kuadrat terkecil
+        $xMean = array_sum($x) / $dataCount;
+        $yMean = array_sum($y) / $dataCount;
+
+        $numerator = 0;
+        $denominator = 0;
+
+        for ($i = 0; $i < $dataCount; $i++) {
+            $numerator += ($x[$i] - $xMean) * ($y[$i] - $yMean);
+            $denominator += pow(($x[$i] - $xMean), 2);
+        }
+
+        $slope = $numerator / $denominator;
+        $intercept = $yMean - ($slope * $xMean);
+
+        // Prediksi biaya listrik bulan ini
+        $currentMonth = $dataCount;
+        $prediction = $slope * $currentMonth + $intercept;
+
+        // Menampilkan prediksi biaya listrik bulan ini
+        return $prediction;
+    }
+
 
     // Yang PerDevice atau perperangkat
     public function getTotalKwhPerMonth()
@@ -270,7 +390,7 @@ class AnalyzeController extends Controller
     {
         $user_id = Auth::id();
 
-        $electricityData = Cache::remember('power_chart_' . $user_id, Carbon::now()->addHours(1), function () use ($user_id) {
+        $electricityData = Cache::remember('powerchart' . $user_id, Carbon::now()->addHours(1), function () use ($user_id) {
             $latestSensorData = DB::table('tb_sensor')
                 ->whereIn('mac_address', function ($query) use ($user_id) {
                     $query->select('mac_address')
@@ -286,7 +406,6 @@ class AnalyzeController extends Controller
 
         return $electricityData;
     }
-
 
 
 

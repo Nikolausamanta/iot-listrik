@@ -19,10 +19,10 @@ class SensorSeeder extends Seeder
     {
         $faker = Faker::create();
         $startDate = Carbon::create(2023, 1, 1); // Tanggal mulai
-        $endDate = Carbon::create(2023, 6, 13); // Tanggal akhir
+        $endDate = Carbon::create(2023, 7, 4); // Tanggal akhir
 
         $totalMinutes = $startDate->diffInMinutes($endDate); // Jumlah menit dalam rentang tanggal
-        $totalDataPerMinute = 1; // Jumlah data yang ingin disimpan setiap menit
+        $totalDataPerMinute = 2; // Jumlah data yang ingin disimpan setiap menit
 
         $data = [];
 
@@ -46,7 +46,7 @@ class SensorSeeder extends Seeder
                 }
 
                 $data[] = [
-                    'mac_address' => '11-B0-D0-63-C2-26',
+                    'mac_address' => '00:B0:D0:63:C2:26',
                     'voltage' => $faker->randomFloat(2, 27, 29),
                     'current' => $faker->randomFloat(2, 0.12, 0.16),
                     'power' => $power,

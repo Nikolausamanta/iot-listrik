@@ -21,7 +21,7 @@ class ManageScheduleController extends Controller
         $device_id = $request->route('device_id');
         $device_name = ManageDeviceModel::where('device_id', $device_id)->value('device_name');
 
-        $schedules = ManageScheduleModel::select('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
+        $schedules = ManageScheduleModel::where('device_id', $device_id)->select('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
             ->groupBy('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
             ->get();
 
@@ -37,10 +37,16 @@ class ManageScheduleController extends Controller
             ];
         }
 
+        $currentTimestamp = strtotime(gmdate('Y-m-d H:i:s')) + (8 * 3600); // Waktu sekarang dalam UTC+8 (GMT+8)
 
+        $data = DB::table('tb_schedule')
+            ->select('nama_schedule', 'time', 'status', 'schedule_condition')
+            ->where('time', '>', $currentTimestamp)
+            ->join('tb_device', 'tb_schedule.device_id', '=', 'tb_device.device_id')
+            ->where('tb_device.device_id', $device_id)
+            ->orderBy('time', 'asc')
+            ->first();
 
-        // $data1 = ManageScheduleModel::where('device_id', $device_id)->orderBy('time', 'desc')->paginate(6);
-        $data2 = ManageScheduleModel::where('device_id', $device_id)->orderBy('time', 'asc')->limit(1)->get();
 
         session(['device_id' => $device_id]);
 
@@ -50,7 +56,7 @@ class ManageScheduleController extends Controller
             'title' => 'Status'
         ])->with('groupedSchedules', $groupedSchedules)
             // ->with('data_manage_schedule', $data1)
-            ->with('upcoming', $data2)
+            ->with('upcoming', $data)
             ->with('device_id', $device_id)
             ->with('device_name', $device_name);
     }
@@ -62,9 +68,6 @@ class ManageScheduleController extends Controller
         $formattedTime = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], $formattedTime);
         return $formattedTime;
     }
-
-
-
 
 
     /**
@@ -200,7 +203,9 @@ class ManageScheduleController extends Controller
      */
     public function edit($id)
     {
-        $schedules = ManageScheduleModel::select('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
+        $session_device_id = session('device_id');
+
+        $schedules = ManageScheduleModel::where('device_id', $session_device_id)->select('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
             ->groupBy('schedule_group', 'nama_schedule', 'status', 'time', 'schedule_condition')
             ->get();
 
@@ -216,12 +221,21 @@ class ManageScheduleController extends Controller
             ];
         }
 
-        $session_device_id = session('device_id');
         $device_name = ManageDeviceModel::where('device_id', $session_device_id)->value('device_name');
 
         $data1 = ManageScheduleModel::where('schedule_group', $id)->first();
         $data3 = ManageScheduleModel::where('schedule_group', $id)->get();
-        $data2 = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('time', 'asc')->limit(1)->get();
+
+
+        $currentTimestamp = strtotime(gmdate('Y-m-d H:i:s')) + (8 * 3600); // Waktu sekarang dalam UTC+8 (GMT+8)
+
+        $data = DB::table('tb_schedule')
+            ->select('nama_schedule', 'time', 'status', 'schedule_condition')
+            ->where('time', '>', $currentTimestamp)
+            ->join('tb_device', 'tb_schedule.device_id', '=', 'tb_device.device_id')
+            ->where('tb_device.device_id', $session_device_id)
+            ->orderBy('time', 'asc')
+            ->first();
 
         $datetimeArray = [];
         foreach ($data3 as $schedule) {
@@ -239,7 +253,7 @@ class ManageScheduleController extends Controller
             'title' => 'Manage Device',
         ])
             ->with('edit_schedule', $data1)
-            ->with('upcoming', $data2)
+            ->with('upcoming', $data)
             ->with('groupedSchedules', $groupedSchedules)
             ->with('device_name', $device_name)
             ->with('device_id', $session_device_id)

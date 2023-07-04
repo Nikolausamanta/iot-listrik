@@ -103,6 +103,6 @@
     </div>
 
     <div class="text-center">
-      <button type="submit" name="submit" class="btn btn-success btn-lg btn-rounded w-100 mt-3 mb-1">Set Now</button>
+      <button type="submit" name="submit" class="btn btn-success btn-lg btn-rounded w-100 mt-3 mb-1">Add Now</button>
     </div>
 </div>

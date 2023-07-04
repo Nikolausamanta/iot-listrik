@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AddDeviceController;
+use App\Http\Controllers\ManageDeviceController;
+use App\Models\ManageDeviceModel;
 use App\Models\ManageStatusModel;
 
 /*
@@ -20,4 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/send-mac-address', [ManageStatusModel::class, 'sendMacAddress']);
+Route::post('/send-mac-address', [ManageDeviceController::class, 'sendMacAddress']);

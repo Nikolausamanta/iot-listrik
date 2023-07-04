@@ -67,5 +67,6 @@ class TimerModel extends Model
     {
         $seconds = $this->getRemainingTime() % 60;
         return str_pad($seconds, 2, '0', STR_PAD_LEFT); // Mengubah format menjadi dua digit dengan padding nol di depan jika diperlukan
+
     }
 }

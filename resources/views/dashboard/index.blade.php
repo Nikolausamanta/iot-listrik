@@ -4,325 +4,239 @@
   
 {{--? Start Card Content  --}}
 <div class="container-fluid">
-    @if (Session::has('success'))
-        <div class="pt-3">
-          <div class="alert alert-success">
-            {{Session::get('success')}}
-          </div>
+    <div class="row mt-3">
+        <div class="col-md-2">
+            <div class="top-title">
+                <h2 class="">Dashboard</h2>
+                <p>Have a nice day</p>
+            </div>
         </div>
-        @endif
+    </div>
+
+    {{-- <hr class="line">    --}}
+
     <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-            <div class="card-body p-3">
+        <div class="col-xl-12 mb-xl-0 mb-4">
             <div class="row">
-                <div class="col-8">
-                <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Money</p>
-                    <h5 class="font-weight-bolder">
-                    $53,000
-                    </h5>
-                    <p class="mb-0">
-                    <span class="text-success text-sm font-weight-bolder">+55%</span>
-                    since yesterday
-                    </p>
+                <div class="col-lg-8 mb-lg-0 mb-4">
+                  {{--? Start Upcoming  --}}
+    
+                  <div class="row mt-3">
+                    <div class="col-md-12 mb-lg-0 mb-4">
+                      <div class="card">
+                          <div class="card-header pb-0 p-3">
+                              <div class="row">
+                                  <div class="col-6 d-flex align-items-center">
+                                      <h6 class="mb-0">Upcoming</h6>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="card-body p-3">
+                              @if($upcoming)
+                                  <div class="row ">
+                                      {{--? Start 1 --}}
+                                      <div class="col-lg-4 mb-lg-0 mb-4 col-6">
+                                        <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
+                                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                                {{-- <div class="d-flex align-items-center text-sm">
+                                                    <button class="btn btn-link text-dark text-sm mb-0 px-0">
+                                                      <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
+                                                    </button>
+                                                </div> --}}
+                                                <div class="d-flex flex-column">
+                                                  <span class="text-sm">Schedule Name</span>
+                                                  <p class="text-md text-dark font-weight-bold mb-0">{{$upcoming->nama_schedule}}</p>
+
+                                                </div>
+                                            </li>
+                                        </div>
+                                      </div>
+                                      {{--? End 1 --}}
+    
+                                      {{--? Start 2 --}}
+                                      <div class="col-lg-4 mb-lg-0 mb-4 col-6">
+                                        <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
+                                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                                {{-- <div class="d-flex align-items-center text-sm">
+                                                    <button class="btn btn-link text-dark text-sm mb-0 px-0">
+                                                      <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
+                                                    </button>
+                                                </div> --}}
+                                                <div class="d-flex flex-column">
+                                                  <span class="text-sm">Time</span>
+                                                  <p class="text-md text-dark font-weight-bold mb-0">{{ \Carbon\Carbon::createFromTimestamp($upcoming->time, 'Asia/Singapore')->format('l, H:i:s') }}</p>
+                                                </div>
+                                            </li>
+                                        </div>
+                                      </div>
+                                      {{--? End 2 --}}
+                                      
+                                      {{--? Start 3 --}}
+                                      <div class="col-lg-2 mb-lg-0 mb-4 col-6">
+                                        <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
+                                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                                {{-- <div class="d-flex align-items-center text-sm">
+                                                    <button class="btn btn-link text-dark text-sm mb-0 px-0">
+                                                      <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
+                                                    </button>
+                                                </div> --}}
+                                                <div class="d-flex flex-column">
+                                                  <span class="text-sm">Status</span>
+                                                  <p class="text-md text-dark font-weight-bold mb-0">{{$upcoming->status == 1 ? 'On' : 'Off'}}</p>
+                                                </div>
+                                            </li>
+                                        </div>
+                                      </div>
+                                      {{--? End 3 --}}
+
+                                      {{--? Start 4 --}}
+                                      <div class="col-lg-2 mb-lg-0 mb-4 col-6">
+                                        <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row" id="card4">
+                                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                                {{-- <div class="d-flex align-items-center text-sm">
+                                                    <button class="btn btn-link text-dark text-sm mb-0 px-0">
+                                                      <i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i>
+                                                    </button>
+                                                </div> --}}
+                                                <div class="d-flex flex-column">
+                                                  <span class="text-sm">Condition</span>
+                                                  <p class="text-md text-dark font-weight-bold mb-0">{{$upcoming->schedule_condition == 'Once' ? 'Only' : 'Repeat'}}</p>
+                                                </div>
+                                            </li>
+                                        </div>
+                                      </div>
+                                      {{--? End 4--}}
+                                      <script>
+                                        window.addEventListener('DOMContentLoaded', () => {
+                                          const card1 = document.getElementById('card1');
+                                          const card2 = document.getElementById('card2');
+                                          const card3 = document.getElementById('card3');
+                                    
+                                          card1.style.height = '120px'; // Set tinggi card pertama
+                                          card2.style.height = `${card1.offsetHeight}px`; // Set tinggi card kedua mengikuti tinggi card pertama
+                                          card3.style.height = `${card1.offsetHeight}px`; // Set tinggi card ketiga mengikuti tinggi card pertama
+                                        });
+                                      </script>
+                                      
+                                  </div>
+                                @else
+                                    <p>No upcoming schedule found.</p>
+                                @endif
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                  {{--? End Upcoming  --}}
+                  
+                  <div class="row mt-4">
+                    {{--? Start Tables --}}
+                    <div class="col-md-12 mb-lg-0">
+                      <div class="card">
+                        <div class="card-header pb-0 p-3">
+                          <div class="row">
+                            <div class="col-6 d-flex align-items-center">
+                                <h6 class="mb-0">Device</h6>
+                            </div>
+                            {{-- <div class="col-6 text-end">
+                                <a class="btn bg-gradient-dark mb-0" href="javascript:;"><i class="fas fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add New Card</a>
+                            </div> --}}
+                          </div>
+                        </div>
+                        <div class="card-body p-3">
+                          <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                              <thead>
+                                <tr>
+                                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">No</th>
+                                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-4">Device Name</th>
+                                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-4">Status</th>
+                                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-4">Remaining Schedule</th>
+                                </tr>
+                                
+                              </thead>
+                              <tbody>
+                                <?php $i = 1; ?>
+                                @foreach ($device as $device)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <p class="font-weight-bold mb-2 mt-2" style="font-size: 14px">{{$i}}</p>
+                                        </td>
+                                        <td class="ps-4">
+                                            <p class="font-weight-bold mb-2 mt-2" style="font-size: 14px">{{ $device->device_name }}</p>
+                                        </td>
+                                        <td class="ps-2 text-center ">
+                                            <span class="badge {{$device->switch == '1' ? 'bg-success' : 'bg-danger'}} mb-2 mt-2" style="width: 45px">
+                                                {{$device->switch == 1 ? 'On' : 'Off'}}
+                                            </span>
+                                        </td>
+                                        <td class="ps-4 text-center">
+                                            <p class="font-weight-bold mb-2 mt-2" style="font-size: 14px">{{ $device->total_schedule }}</p>
+                                        </td>
+                                    </tr>
+                                    <?php $i++; ?>
+                                @endforeach
+                            </tbody>
+                            
+                            </table>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    {{--? End Tables --}}
+                  </div>
                 </div>
+    
+                {{--? Start Input --}}
+                <div class="col-lg-4">
+                  <div class="row mt-3 d-none d-lg-block">
+                    <div class="col-md-12 mb-lg-0">
+                        <div class="card">
+                            <div class="card-body py-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Device</p>
+                                            <h4 class="font-weight-bolder mb-0">{{$totalDevices}}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                                            <i class="ni ni-ungroup text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-4 text-end">
-                <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                <div class="mt-4 d-none d-lg-block">
+                    <div class="col-xl-12 mb-xl-0 mb-4">
+                        <div class="card bg-transparent shadow-xl">
+                            <div class="overflow-hidden position-relative border-radius-xl" style="height: 390px; background-image: url('assets/img/card-visa.jpg');"></div>
+                        </div>
+                    </div>
                 </div>
-                </div>
+                {{--? End Input --}}  
             </div>
-            </div>
-        </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-            <div class="card-body p-3">
-            <div class="row">
-                <div class="col-8">
-                <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Users</p>
-                    <h5 class="font-weight-bolder">
-                    2,300
-                    </h5>
-                    <p class="mb-0">
-                    <span class="text-success text-sm font-weight-bolder">+3%</span>
-                    since last week
-                    </p>
-                </div>
-                </div>
-                <div class="col-4 text-end">
-                <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
-                    <i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-            <div class="card-body p-3">
-            <div class="row">
-                <div class="col-8">
-                <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">New Clients</p>
-                    <h5 class="font-weight-bolder">
-                    +3,462
-                    </h5>
-                    <p class="mb-0">
-                    <span class="text-danger text-sm font-weight-bolder">-2%</span>
-                    since last quarter
-                    </p>
-                </div>
-                </div>
-                <div class="col-4 text-end">
-                <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
-                    <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
-        </div>
-        <div class="col-xl-3 col-sm-6">
-        <div class="card">
-            <div class="card-body p-3">
-            <div class="row">
-                <div class="col-8">
-                <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Sales</p>
-                    <h5 class="font-weight-bolder">
-                    $103,430
-                    </h5>
-                    <p class="mb-0">
-                    <span class="text-success text-sm font-weight-bolder">+5%</span> than last month
-                    </p>
-                </div>
-                </div>
-                <div class="col-4 text-end">
-                <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
-                    <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
         </div>
     </div>
     {{--? End Card Content  --}}
-
-    {{--? Start Content 2 Column   --}}
-    <div class="row mt-4">
-        <div class="col-lg-7 mb-lg-0 mb-4">
-        <div class="card ">
-            <div class="card-header pb-0 p-3">
-            <div class="d-flex justify-content-between">
-                <h6 class="mb-2">Sales by Country</h6>
-            </div>
-            </div>
-            <div class="table-responsive">
-            <table class="table align-items-center ">
-                <tbody>
-                <tr>
-                    <td class="w-30">
-                    <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                        <img src="../assets/img/icons/flags/US.png" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                        <p class="text-xs font-weight-bold mb-0">Country:</p>
-                        <h6 class="text-sm mb-0">United States</h6>
-                        </div>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                        <h6 class="text-sm mb-0">2500</h6>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Value:</p>
-                        <h6 class="text-sm mb-0">$230,900</h6>
-                    </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                    <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                        <h6 class="text-sm mb-0">29.9%</h6>
-                    </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="w-30">
-                    <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                        <img src="../assets/img/icons/flags/DE.png" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                        <p class="text-xs font-weight-bold mb-0">Country:</p>
-                        <h6 class="text-sm mb-0">Germany</h6>
-                        </div>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                        <h6 class="text-sm mb-0">3.900</h6>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Value:</p>
-                        <h6 class="text-sm mb-0">$440,000</h6>
-                    </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                    <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                        <h6 class="text-sm mb-0">40.22%</h6>
-                    </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="w-30">
-                    <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                        <img src="../assets/img/icons/flags/GB.png" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                        <p class="text-xs font-weight-bold mb-0">Country:</p>
-                        <h6 class="text-sm mb-0">Great Britain</h6>
-                        </div>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                        <h6 class="text-sm mb-0">1.400</h6>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Value:</p>
-                        <h6 class="text-sm mb-0">$190,700</h6>
-                    </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                    <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                        <h6 class="text-sm mb-0">23.44%</h6>
-                    </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="w-30">
-                    <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                        <img src="../assets/img/icons/flags/BR.png" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                        <p class="text-xs font-weight-bold mb-0">Country:</p>
-                        <h6 class="text-sm mb-0">Brasil</h6>
-                        </div>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                        <h6 class="text-sm mb-0">562</h6>
-                    </div>
-                    </td>
-                    <td>
-                    <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Value:</p>
-                        <h6 class="text-sm mb-0">$143,960</h6>
-                    </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                    <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                        <h6 class="text-sm mb-0">32.14%</h6>
-                    </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            </div>
-        </div>
-        </div>
-        <div class="col-lg-5">
-        <div class="card">
-            <div class="card-header pb-0 p-3">
-            <h6 class="mb-0">Categories</h6>
-            </div>
-            <div class="card-body p-3">
-            <ul class="list-group">
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                    <i class="ni ni-mobile-button text-white opacity-10"></i>
-                    </div>
-                    <div class="d-flex flex-column">
-                    <h6 class="mb-1 text-dark text-sm">Devices</h6>
-                    <span class="text-xs">250 in stock, <span class="font-weight-bold">346+ sold</span></span>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
-                </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                    <i class="ni ni-tag text-white opacity-10"></i>
-                    </div>
-                    <div class="d-flex flex-column">
-                    <h6 class="mb-1 text-dark text-sm">Tickets</h6>
-                    <span class="text-xs">123 closed, <span class="font-weight-bold">15 open</span></span>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
-                </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                    <i class="ni ni-box-2 text-white opacity-10"></i>
-                    </div>
-                    <div class="d-flex flex-column">
-                    <h6 class="mb-1 text-dark text-sm">Error logs</h6>
-                    <span class="text-xs">1 is active, <span class="font-weight-bold">40 closed</span></span>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
-                </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                    <i class="ni ni-satisfied text-white opacity-10"></i>
-                    </div>
-                    <div class="d-flex flex-column">
-                    <h6 class="mb-1 text-dark text-sm">Happy users</h6>
-                    <span class="text-xs font-weight-bold">+ 430</span>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
-                </div>
-                </li>
-            </ul>
-            </div>
-        </div>
-        </div>
-    </div>
-    {{--? End Content 2 Column   --}}
-
 @endsection
+
+@if (Session::has('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                // title: 'Success',
+                text: '{{ Session::get('success') }}',
+                icon: 'success',
+                timer: 3000, // Timeout dalam milidetik (3 detik)
+                timerProgressBar: true,
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false
+            });
+        });
+    </script>
+@endif

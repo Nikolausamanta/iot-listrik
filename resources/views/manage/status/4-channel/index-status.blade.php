@@ -72,8 +72,8 @@
                                                                 <button class="btn btn-link text-dark text-sm mb-0 px-0"><i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i></button>
                                                             </div>
                                                             <div class="d-flex flex-column">
-                                                                <span class="text-sm">Current Consumption</span>
-                                                                <h5 class="text-dark font-weight-bold"> kWh</h5>
+                                                                <span class="text-sm">Consumption This Month</span>
+                                                                <h5 class="text-dark font-weight-bold">{{$totalKwh}} kWh</h5>
                                                             </div>
                                                         </li>
                                                     </div>
@@ -131,7 +131,7 @@
                                         <button class="btn btn-link text-dark text-sm mb-0 px-0"><i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i></button>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <span class="text-sm">Voltage</span>
+                                        <span class="text-sm">Voltage (V)</span>
                                         <h5 class="text-dark font-weight-bold" id="voltage"> V</h5>
                                     </div>
                                 </li>
@@ -147,7 +147,7 @@
                                         <button class="btn btn-link text-dark text-sm mb-0 px-0"><i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i></button>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <span class="text-sm">Current</span>
+                                        <span class="text-sm">Current (A)</span>
                                         <h5 class="text-dark font-weight-bold" id="current"> A</h5>
                                     </div>
                                 </li>
@@ -163,7 +163,7 @@
                                         <button class="btn btn-link text-dark text-sm mb-0 px-0"><i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i></button>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <span class="text-sm">Power</span>
+                                        <span class="text-sm">Power (W)</span>
                                         <h5 class="text-dark font-weight-bold" id="power"> W</h5>
                                     </div>
                                 </li>
@@ -179,7 +179,7 @@
                                         <button class="btn btn-link text-dark text-sm mb-0 px-0"><i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i></button>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <span class="text-sm">Energy</span>
+                                        <span class="text-sm">Energy (J)</span>
                                         <h5 class="text-dark font-weight-bold" id="energy"> J</h5>
                                     </div>
                                 </li>
@@ -195,7 +195,7 @@
                                         <button class="btn btn-link text-dark text-sm mb-0 px-0"><i class="me-4 ni ni-tv-2 text-primary opacity-10" style="font-size: 15px"></i></button>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <span class="text-sm">Frequency</span>
+                                        <span class="text-sm">Frequency (Hz)</span>
                                         <h5 class="text-dark font-weight-bold" id="frequency"> Hz</h5>
                                     </div>
                                 </li>

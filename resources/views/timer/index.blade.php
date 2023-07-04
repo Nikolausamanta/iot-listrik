@@ -9,7 +9,7 @@
         <div class="col-lg-3">
             <div class="card">
                 <div class="card-header">
-                    Set Timer
+                    Set Countdown
                 </div>
                 <div class="card-body">
                     <form id="set-timer-form" action="{{ route('timers.store') }}" method="post" role="form text-left">
@@ -93,10 +93,11 @@
                         <span class="clock-minute" id="clock-minute-{{ $timer->timer_id }}">{{ $timer->getRemainingMinutes() }}</span> &ensp; minutes &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
                         <span class="clock-second" id="clock-second-{{ $timer->timer_id }}">{{ $timer->getRemainingSeconds() }}</span> &ensp; seconds
                     </div>
-                    <form action="{{ route('timers.cancel', $timer) }}" method="POST">
+                    <form id="cancel-timer-form" action="{{ route('timers.cancel', $timer) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-danger btn-lg btn-rounded w-100 mt-4 mb-0">Cancel</button>
+                        <button type="submit" class="btn btn-danger btn-lg btn-rounded w-100 mt-4 mb-0" onclick="showCancelAlert(event)">Cancel</button>
                     </form>
+                    
                 </div>
             </div>
         </div>
@@ -171,6 +172,23 @@
                     confirmButtonText: 'OK'
                 });
             }
+
+            function showCancelAlert(event) {
+        event.preventDefault(); // Menghentikan form submit secara default
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to undo this action.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Jika tombol "Yes, cancel it!" ditekan
+                document.getElementById('cancel-timer-form').submit(); // Submit form
+            }
+        });
+    }
 
             var timerInterval{{ $timer->timer_id }} = setInterval(countdown{{ $timer->timer_id }}, 1000);
         </script>
