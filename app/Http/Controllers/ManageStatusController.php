@@ -113,37 +113,24 @@ class ManageStatusController extends Controller
         }
     }
 
-
-
+    // Merubah Value Relay
     public function relay($value)
     {
         $session_device_id = session('device_id');
-        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
 
-        if ($device) {
-            $mac_address = $device->mac_address;
-
-            $relay = ManageRelayModel::whereHas('device', function ($query) use ($mac_address) {
-                $query->where('mac_address', $mac_address);
-            })->first();
-
-            if ($relay) {
-                $device_id = $relay->device_id;
-                if ($value == "on") {
-                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 1]);
-                } else {
-                    ManageRelayModel::where('device_id', $device_id)->update(['switch' => 0]);
-                }
-            }
+        if ($value == "on") {
+            ManageRelayModel::where('device_id', $session_device_id)->update(['switch' => 1]);
+        } else {
+            ManageRelayModel::where('device_id', $session_device_id)->update(['switch' => 0]);
         }
     }
 
-    public function send()
-    {
-        $relay_id = 1;
-        $dddd = ManageRelayModel::where('relay_id', $relay_id)->pluck('switch');
-        return $dddd[0];
-    }
+    // public function send()
+    // {
+    //     $relay_id = 1;
+    //     $dddd = ManageRelayModel::where('relay_id', $relay_id)->pluck('switch');
+    //     return $dddd[0];
+    // }
 
     public function getFormattedTime($time)
     {

@@ -68,13 +68,13 @@ class TimerController extends Controller
         return redirect('/timers/' . $device_id_session)->with('success', 'Timer created or updated successfully.');
     }
 
-    public function start(Request $request, TimerModel $timer)
-    {
-        $timer->startTimer();
-        $device_id_session = session('device_id');
+    // public function start(Request $request, TimerModel $timer)
+    // {
+    //     $timer->startTimer();
+    //     $device_id_session = session('device_id');
 
-        return redirect('/timers/' . $device_id_session)->with('success', 'Timer started successfully.');
-    }
+    //     return redirect('/timers/' . $device_id_session)->with('success', 'Timer started successfully.');
+    // }
 
     public function cancel(Request $request, TimerModel $timer)
     {
@@ -86,48 +86,18 @@ class TimerController extends Controller
 
     public function updateSwitch(Request $request, $timer)
     {
-        // $dataTimer = TimerModel::where('timer_id', $timer)->get('device_id');
-
-        // foreach ($dataTimer as $timer) {
-        //     $device_id = $timer->device_id;
-        //     $status = $timer->status;
-        //     $relay = ManageRelayModel::where('device_id', $device_id)->first();
-
-        //     // Memperbarui nilai switch berdasarkan kondisi yang diberikan
-        //     $newSwitchValue = ($relay->switch == $status);
-
-        //     ManageRelayModel::where('device_id', $device_id)->update(['switch' => $newSwitchValue]);
-        // }
-
-
         $session_device_id = session('device_id');
-        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+        $data = TimerModel::where('device_id', $session_device_id)->get();
 
-        if ($device) {
-            $mac_address = $device->mac_address;
+        foreach ($data as $schedule) {
+            $device_id = $schedule->device_id;
+            $status = $schedule->status;
 
-            $relay = ManageRelayModel::whereHas('device', function ($query) use ($mac_address) {
-                $query->where('mac_address', $mac_address);
-            })->first();
-
-            if ($relay) {
-                $device_id_relay = $relay->device_id;
-
-                $data = TimerModel::where('device_id', $session_device_id)->orderBy('timer_id', 'asc')->get();
-
-                foreach ($data as $schedule) {
-                    $device_id = $schedule->device_id;
-                    $status = $schedule->status;
-
-                    if ($device_id == $session_device_id) {
-                        ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $status]);
-                    }
-                }
+            if ($device_id == $session_device_id) {
+                ManageRelayModel::where('device_id', $session_device_id)->update(['switch' => $status]);
             }
         }
     }
-
-
 
     /**
      * Show the form for creating a new resource.

@@ -18,11 +18,11 @@ class SensorSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        $startDate = Carbon::create(2023, 1, 1); // Tanggal mulai
+        $startDate = Carbon::create(2023, 7, 1); // Tanggal mulai
         $endDate = Carbon::create(2023, 7, 4); // Tanggal akhir
 
         $totalMinutes = $startDate->diffInMinutes($endDate); // Jumlah menit dalam rentang tanggal
-        $totalDataPerMinute = 2; // Jumlah data yang ingin disimpan setiap menit
+        $totalDataPerMinute = 5; // Jumlah data yang ingin disimpan setiap menit
 
         $data = [];
 

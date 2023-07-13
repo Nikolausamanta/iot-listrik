@@ -101,7 +101,7 @@ class AnalyzeController extends Controller
         $xMean = array_sum($x) / $dataCount;
         $yMean = array_sum($y) / $dataCount;
 
-        $numerator = 0;
+        $numerator = 0; // variabel yang digunakan untuk menghitung gradien
         $denominator = 0;
 
         for ($i = 0; $i < $dataCount; $i++) {
@@ -169,8 +169,8 @@ class AnalyzeController extends Controller
             $denominator += pow(($x[$i] - $xMean), 2);
         }
 
-        $slope = $numerator / $denominator;
-        $intercept = $yMean - ($slope * $xMean);
+        $slope = $numerator / $denominator; // hitung gradien garis regresi
+        $intercept = $yMean - ($slope * $xMean);  // titik potong garis regresi dengan sumbu y
 
         // Prediksi biaya listrik bulan berikutnya
         $nextMonth = $dataCount + 1;
@@ -390,24 +390,18 @@ class AnalyzeController extends Controller
     {
         $user_id = Auth::id();
 
-        $electricityData = Cache::remember('powerchart' . $user_id, Carbon::now()->addHours(1), function () use ($user_id) {
-            $latestSensorData = DB::table('tb_sensor')
-                ->whereIn('mac_address', function ($query) use ($user_id) {
-                    $query->select('mac_address')
-                        ->from('tb_device')
-                        ->where('user_id', $user_id);
-                })
-                ->orderBy('created_at', 'desc')
-                ->take(6)
-                ->get();
+        $latestSensorData = DB::table('tb_sensor')
+            ->whereIn('mac_address', function ($query) use ($user_id) {
+                $query->select('mac_address')
+                    ->from('tb_device')
+                    ->where('user_id', $user_id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
 
-            return response()->json($latestSensorData);
-        });
-
-        return $electricityData;
+        return response()->json($latestSensorData);
     }
-
-
 
     /**
      * Show the form for creating a new resource.

@@ -47,7 +47,6 @@ class ManageScheduleController extends Controller
             ->orderBy('time', 'asc')
             ->first();
 
-
         session(['device_id' => $device_id]);
 
 
@@ -68,7 +67,6 @@ class ManageScheduleController extends Controller
         $formattedTime = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], $formattedTime);
         return $formattedTime;
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -181,8 +179,6 @@ class ManageScheduleController extends Controller
 
         return $epochTime;
     }
-
-
 
     /**
      * Display the specified resource.
@@ -321,8 +317,6 @@ class ManageScheduleController extends Controller
     }
 
 
-
-
     /**
      * Remove the specified resource from storage.
      *
@@ -350,40 +344,23 @@ class ManageScheduleController extends Controller
         $local_time = time();
 
         $session_device_id = session('device_id');
-        $device = ManageDeviceModel::where('device_id', $session_device_id)->first();
+        $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('schedule_id', 'asc')->get();
 
-        if ($device) {
-            $mac_address = $device->mac_address;
+        foreach ($data as $schedule) {
+            $schedule_id = $schedule->schedule_id;
+            $device_id = $schedule->device_id;
+            $time = $schedule->time;
+            $status = $schedule->status;
+            $condition = $schedule->schedule_condition;
 
-            $relay = ManageRelayModel::whereHas('device', function ($query) use ($mac_address) {
-                $query->where('mac_address', $mac_address);
-            })->first();
-
-            if ($relay) {
-                $device_id_relay = $relay->device_id;
-
-                $data = ManageScheduleModel::where('device_id', $session_device_id)->orderBy('schedule_id', 'asc')->get();
-
-                foreach ($data as $schedule) {
-                    $schedule_id = $schedule->schedule_id;
-                    $device_id = $schedule->device_id;
-                    $time = $schedule->time;
-                    $status = $schedule->status;
-                    $condition = $schedule->schedule_condition;
-
-                    if ($device_id == $session_device_id) {
-                        if ($local_time == $time) {
-                            ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $status]);
-                            if ($condition == 'once') {
-                                $schedule->where('schedule_id', $schedule_id)->delete();
-                            } elseif ($condition == 'repeat') {
-                                $newDate = Carbon::createFromTimestamp($schedule->time)->addWeeks(1); // Tambahkan 1 minggu
-                                $schedule->where('schedule_id', $schedule_id)->update(['time' => $newDate->timestamp]);
-                            }
-                        }
-                        // elseif ($time == $jam2) {
-                        //     ManageRelayModel::where('device_id', $device_id_relay)->update(['switch' => $newSwitchValue]);
-                        // }
+            if ($device_id == $session_device_id) {
+                if ($local_time == $time) {
+                    ManageRelayModel::where('device_id', $session_device_id)->update(['switch' => $status]);
+                    if ($condition == 'once') {
+                        $schedule->where('schedule_id', $schedule_id)->delete();
+                    } elseif ($condition == 'repeat') {
+                        $newDate = Carbon::createFromTimestamp($schedule->time)->addWeeks(1); // Tambahkan 1 minggu
+                        $schedule->where('schedule_id', $schedule_id)->update(['time' => $newDate->timestamp]);
                     }
                 }
             }
