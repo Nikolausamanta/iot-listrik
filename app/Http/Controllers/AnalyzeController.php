@@ -87,53 +87,64 @@ class AnalyzeController extends Controller
 
         foreach ($readings as $reading) {
             $kwh = $reading->total_kwh * (1 / 2582);
-            $electricityData[] = $kwh * 1352;
+            $electricityData[] = round($kwh * 1352);
         }
 
         // Menghitung jumlah data
         $dataCount = count($electricityData);
 
-        // Membuat array untuk menyimpan data independen (bulan ke-) dan dependen (biaya listrik)
-        $x = range(1, $dataCount);
-        $y = $electricityData;
+        $x = [];
+        $y = [];
+        $xy = [];
+        $xx = [];
 
-        // Menghitung persamaan regresi linier menggunakan metode kuadrat terkecil
-        $xMean = array_sum($x) / $dataCount;
-        $yMean = array_sum($y) / $dataCount;
-
-        $numerator = 0; // variabel yang digunakan untuk menghitung gradien
-        $denominator = 0;
-
+        // Membuat array untuk menyimpan data independen X (bulan ke-) dan dependen Y (biaya listrik)
         for ($i = 0; $i < $dataCount; $i++) {
-            $numerator += ($x[$i] - $xMean) * ($y[$i] - $yMean);
-            $denominator += pow(($x[$i] - $xMean), 2);
+            $x[$i] = $i + 1;
+            $y[$i] = $electricityData[$i];
+            $xy[$i] = $x[$i] * $y[$i];
+            $xx[$i] = $x[$i] * $x[$i];
         }
 
-        $slope = $numerator / $denominator;
-        $intercept = $yMean - ($slope * $xMean);
+        // Menghitung nilai-nilai sigma
+        $sigma_x = array_sum($x);
+        $sigma_y = array_sum($y);
+        $sigma_xy = array_sum($xy);
+        $sigma_xx = array_sum($xx);
+
+        // Menghitung a dan b
+        $numerator = ($dataCount * $sigma_xy) - ($sigma_x * $sigma_y); //Pembilang
+        $denominator = ($dataCount * $sigma_xx) - ($sigma_x * $sigma_x); //Pembagi
+
+        $b = $numerator / $denominator;
+        $a = ($sigma_y - ($b * $sigma_x)) / $dataCount;
 
         // Prediksi biaya listrik bulan berikutnya
         $nextMonth = $dataCount + 1;
-        $prediction = $slope * $nextMonth + $intercept;
+        $prediction = round($b * $nextMonth + $a);
 
         // Menyiapkan data aktual dan prediksi setiap bulan
         $monthlyData = [];
         for ($i = 0; $i < $dataCount; $i++) {
+            $monthName = Carbon::createFromFormat('!m', $i + 1)->monthName;
             $monthlyData[] = [
-                'month' => $i + 1,
+                'year' => $readings[$i]->year,
+                'month' => $monthName,
                 'actual' => $y[$i],
-                'predicted' => $slope * ($i + 1) + $intercept,
+                'predicted' => round($b * ($i + 1) + $a), // Bulatkan nilai prediksi menjadi bilangan bulat
             ];
         }
 
         // Menambahkan data prediksi untuk bulan berikutnya
+        $nextMonthName = Carbon::createFromFormat('!m', $nextMonth)->monthName;
         $monthlyData[] = [
-            'month' => $nextMonth,
+            'year' => $readings[$dataCount - 1]->year,
+            'month' => $nextMonthName,
             'actual' => null,
             'predicted' => $prediction,
         ];
 
-        return $monthlyData;
+        return response()->json($monthlyData);
     }
 
     public function getTotalKwhNextMonth()

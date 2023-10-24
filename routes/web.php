@@ -57,7 +57,8 @@ Route::middleware('isLogin')->group(function () {
     Route::get('analyze/get/allpowerchart', [AnalyzeController::class, 'getPowerChart']);
     Route::get('analyze/get/kwh', [AnalyzeController::class, 'getTotalKwh']);
     Route::get('analyze/get/kwhmonth', [AnalyzeController::class, 'getTotalKwhPerMonth']);
-    Route::get('analyze/get/forecast', [AnalyzeController::class, 'forecast']);
+    // Route::get('/analyze/get/available-years', [AnalyzeController::class, 'getAvailableYears']);
+    Route::get('/analyze/get/forecast', [AnalyzeController::class, 'forecast']);
     Route::get('manage-status/get/powerchart', [ManageStatusController::class, 'getPowerChart'])->name('datachart.power');
     Route::get('manage-status/get/cardsensor', [ManageStatusController::class, 'getCardSensor'])->name('datacard.all');
     Route::get('manage-status/get/totalkwh', [ManageStatusController::class, 'getTotalKwhPerMonth'])->name('datacard.totalkwh');

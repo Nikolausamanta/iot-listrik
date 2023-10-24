@@ -48,10 +48,12 @@
             <div class="card z-index-2 h-100">
                 <div class="card-header pb-0 pt-3 bg-transparent">
                     <h6 class="text-capitalize">Cost Predictions</h6>
+                    <label for="tahun-select">Select Year:</label>
+                    <select id="tahun-select" class="form-select"></select>
                 </div>
                 <div class="card-body p-3">
                     <div class="chart">
-                        <canvas id="line-chart-gradient" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
+                        <canvas id="prediction-chart" class="chart-canvas" height="800" width="1115" style="display: block; box-sizing: border-box; height: 300px; width: 557.9px;"></canvas>
                     </div>
                 </div>
             </div>
